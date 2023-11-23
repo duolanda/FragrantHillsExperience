@@ -8,9 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Communication.unity
     guid: 647689cebcbfb47f0aaaef348a1e5c9e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ARCollaborationData/ARCollaborationDataExample.unity
     guid: 900e7bfe6122645fba71b90941afb9c5
+  - enabled: 1
+    path: Assets/Scenes/Draw.unity
+    guid: 637834fa0aae845aa809437f1b4f56b0
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ee8d582ce8e1e4e82aae9346ded91ffc, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: ac23f3052b9ad4dd6892fb76882afe48, type: 2}
