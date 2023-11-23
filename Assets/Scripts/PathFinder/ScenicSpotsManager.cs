@@ -22,8 +22,7 @@ public class ScenicSpotsManager : MonoBehaviour {
         // spot1.AddNeighbor(spot2); // 景点1与景点2相连
         ImportScenicSpots();
         
-        // List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,44,35,32,28,21,4,3});
-        List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){21,4,3});
+        List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,44,35,32,28,21,4,3});
 
         pathDrawer.DrawPath(result);
 
@@ -62,33 +61,14 @@ public class ScenicSpotsManager : MonoBehaviour {
     
     public List<ScenicSpot> FindPathCoveringAllSpots(List<int> spotIDs) {
         List<ScenicSpot> path = new List<ScenicSpot>();
-        HashSet<int> remainingSpotIDs = new HashSet<int>(spotIDs);
 
-        // 可以从列表中的任何一个点开始，这里我们从第一个点开始
-        ScenicSpot currentSpot = spotsDictionary[spotIDs[0]];
-        remainingSpotIDs.Remove(currentSpot.id);
-        path.Add(currentSpot);
+        for (int i = 0; i < spotIDs.Count - 1; i++) {
+            ScenicSpot currentSpot = spotsDictionary[spotIDs[i]];
+            ScenicSpot nextSpot = spotsDictionary[spotIDs[i + 1]];
 
-        while (remainingSpotIDs.Count > 0) {
-            ScenicSpot nextClosestSpot = null;
-            float shortestDistance = float.MaxValue;
-
-            foreach (int id in remainingSpotIDs) {
-                ScenicSpot candidateSpot = spotsDictionary[id];
-                float distance = Vector3.Distance(currentSpot.position, candidateSpot.position);
-                if (distance < shortestDistance) {
-                    shortestDistance = distance;
-                    nextClosestSpot = candidateSpot;
-                }
-            }
-
-            if (nextClosestSpot != null) {
-                path.AddRange(GetPathBetweenSpots(currentSpot, nextClosestSpot)); // 使用你的路径查找算法
-                currentSpot = nextClosestSpot;
-                remainingSpotIDs.Remove(currentSpot.id);
-            }
+            List<ScenicSpot> subPath = GetPathBetweenSpots(currentSpot, nextSpot); // 使用你的路径查找算法
+            path.AddRange(subPath);
         }
-
         return path;
     }
 
