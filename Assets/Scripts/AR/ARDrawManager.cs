@@ -36,10 +36,17 @@ public class ARDrawManager : Singleton<ARDrawManager>
 
     void Update()
     {
+    #if !UNITY_EDITOR    
         if (Input.touchCount > 0)
-        {
             DrawOnTouch();
+    #else
+        if(Input.GetMouseButton(0))
+            DrawOnMouse();
+        else
+        {
+            prevLineRender = null;
         }
+#endif
     }
 
     public void AllowDraw(bool isAllow)
@@ -84,6 +91,27 @@ public class ARDrawManager : Singleton<ARDrawManager>
         else
         {
             UpdateLine(touchPosition);
+        }
+    }
+    
+    void DrawOnMouse()
+    {
+        if(!CanDraw) return;
+
+        Vector3 mousePosition = arCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceFromCamera));
+
+        if(Input.GetMouseButton(0))
+        {
+            OnDraw?.Invoke();
+
+            if(prevLineRender == null)
+            {
+                AddNewLineRenderer(null, mousePosition);
+            }
+            else 
+            {
+                UpdateLine(mousePosition);
+            }
         }
     }
     

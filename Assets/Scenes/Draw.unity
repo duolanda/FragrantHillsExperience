@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5752200
 RectTransform:
   m_ObjectHideFlags: 0
@@ -333,7 +333,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 37862277}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!1 &181175364
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,9 +533,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 5752199}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
+      - m_Target: {fileID: 1311113123}
+        m_TargetAssemblyTypeName: ARKitCoachingOverlay, Assembly-CSharp
+        m_MethodName: DisableCoaching
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -543,7 +543,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 1680960252}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
@@ -572,9 +572,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 5752199}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
+      - m_Target: {fileID: 1311113123}
+        m_TargetAssemblyTypeName: ARKitCoachingOverlay, Assembly-CSharp
+        m_MethodName: ActivateCoaching
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -950,6 +950,7 @@ GameObject:
   - component: {fileID: 1311113122}
   - component: {fileID: 1311113121}
   - component: {fileID: 1311113120}
+  - component: {fileID: 1311113123}
   m_Layer: 0
   m_Name: AR Session
   m_TagString: Untagged
@@ -999,6 +1000,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1311113123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311113119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf789f6b4026a4b169354686ee1853d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Goal: 3
+  m_ActivatesAutomatically: 1
 --- !u!1 &1680960252
 GameObject:
   m_ObjectHideFlags: 0
