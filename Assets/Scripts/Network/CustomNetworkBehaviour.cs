@@ -44,7 +44,7 @@ public class CustomNetworkBehaviour : NetworkBehaviour
         inputField.text = string.Empty;
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     private void CmdSendMessage(string message)
     {
         // Validate message

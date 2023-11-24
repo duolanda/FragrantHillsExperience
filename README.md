@@ -15,6 +15,8 @@ A Unity program that people can enjoy when they visit the Fragrant Hills（香�
 
 - [x] Communication between phone and computer
 
+  - [ ] Only the latest device can send message
+
 - [x] AR drawing
 
   - [x] Use correct shader to set color
