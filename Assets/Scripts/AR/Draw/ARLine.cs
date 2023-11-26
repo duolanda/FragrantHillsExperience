@@ -1,16 +1,15 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
-public class ARLine 
+public class ARLine
 {
     private int positionCount = 0;
 
     private Vector3 prevPointDistance = Vector3.zero;
     
-    private LineRenderer LineRenderer { get; set; }
-    public GameObject LineRendererObject { get; set; }
-
+    public LineRenderer LineRenderer { get; set; }
     private LineSettings settings;
+    
 
     public ARLine(LineSettings settings)
     {
@@ -43,11 +42,9 @@ public class ARLine
     public void AddNewLineRenderer(Transform parent, ARAnchor anchor, Vector3 position)
     {
         positionCount = 2;
-        GameObject remote = GameObject.Find("RemoteLineRenderer");
         GameObject go = new GameObject($"LineRenderer");
         
-        // go.transform.parent = anchor?.transform ?? parent;
-        go.transform.parent = remote.transform;
+        go.transform.parent = anchor?.transform ?? parent;
         go.transform.position = position;
         go.tag = settings.lineTagName;
         
@@ -69,21 +66,30 @@ public class ARLine
         goLineRenderer.SetPosition(1, position);
 
         LineRenderer = goLineRenderer;
-        LineRendererObject = go;
 
         ARDebugManager.Instance.LogInfo($"New line renderer created");
     } 
     
-    public void AddNewLineRenderer(GameObject lr)
+    public void AddNewLineRenderer(SerializableLineData deserializedData)
     {
         GameObject go = new GameObject($"LineRenderer");
 
-        go.transform.parent = lr.transform;
-        go.transform.position = lr.transform.position;
+        // go.transform.parent = lr.transform;
+        // go.transform.position = lr.transform.position;
         go.tag = settings.lineTagName;
         
         LineRenderer goLineRenderer = go.AddComponent<LineRenderer>();
-        goLineRenderer = lr.GetComponent<LineRenderer>();
+        
+        goLineRenderer.positionCount = deserializedData.points.Count;
+        for (int i = 0; i < deserializedData.points.Count; i++)
+        {
+            goLineRenderer.SetPosition(i, deserializedData.points[i]);
+        }
+        // goLineRenderer.startColor = deserializedData.startColor;
+        // goLineRenderer.endColor = deserializedData.endColor;
+        // goLineRenderer.startWidth = deserializedData.startWidth;
+        // goLineRenderer.endWidth = deserializedData.endWidth;
+        
         LineRenderer = goLineRenderer;
 
         ARDebugManager.Instance.LogInfo($"New received line renderer created");

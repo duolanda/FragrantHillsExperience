@@ -121,6 +121,7 @@ public class CollaborativeSession : MonoBehaviour
                 if (collaborationData.valid)
                 {
                     subsystem.UpdateWithCollaborationData(collaborationData);
+
                     if (collaborationData.priority == ARCollaborationDataPriority.Critical)
                     {
                         Debug.Log($"Received {data.Bytes.Length} bytes of collaboration data.");
@@ -128,6 +129,15 @@ public class CollaborativeSession : MonoBehaviour
                 }
                 else
                 {
+                    //虽然不知道它们 valid 是怎么实现的，但可以根据排除法知道，我们的数据肯定不是 valid
+                     NativeSlice<byte> nativeSlice = data.Bytes;
+                                    byte[] byteArray = new byte[nativeSlice.Length];
+                                    for (int i = 0; i < nativeSlice.Length; i++)
+                                    {
+                                        byteArray[i] = data.Bytes[i];
+                                    }
+                    ARDrawManager.Instance.HandleReceiveLinesData(byteArray);
+
                     Debug.Log($"Received {data.Bytes.Length} bytes from remote, but the collaboration data was not valid.");
                 }
             }
@@ -146,7 +156,7 @@ public class CollaborativeSession : MonoBehaviour
             NativeArray<byte> nativeArray = new NativeArray<byte>(lineData, Allocator.Temp);
             NativeSlice<byte> nativeSlice = new NativeSlice<byte>(nativeArray);
             m_MCSession.SendToAllPeers(NSData.CreateWithBytesNoCopy(nativeSlice), MCSessionSendDataMode.Reliable);
-            nativeArray.Dispose();
+            // nativeArray.Dispose();
         }
     }
 

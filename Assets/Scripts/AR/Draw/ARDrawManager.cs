@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.ARFoundation;
@@ -19,6 +20,9 @@ public class ARDrawManager : Singleton<ARDrawManager>
     private bool CanDraw { get; set; }
     private CollaborativeSession collaborativeSession;
     
+    private GameObject currentRemotePrefab;
+
+    
     void Start()
     {
         collaborativeSession = FindObjectOfType<CollaborativeSession>();
@@ -28,7 +32,7 @@ public class ARDrawManager : Singleton<ARDrawManager>
     {
     #if !UNITY_EDITOR    
         DrawOnTouch();
-        collaborativeSession?.ReceiveLinesData(HandleReceiveLinesData);
+        // collaborativeSession?.ReceiveLinesData(HandleReceiveLinesData);
     #else
         DrawOnMouse();
     #endif
@@ -60,6 +64,7 @@ public class ARDrawManager : Singleton<ARDrawManager>
                 anchors.Add(anchor);
                 ARDebugManager.Instance.LogInfo($"Anchor created & total of {anchors.Count} anchor(s)");
             }
+
             currentLine = new ARLine(lineSettings);
             currentLine.AddNewLineRenderer(transform, anchor, touchPosition);
         }
@@ -120,14 +125,24 @@ public class ARDrawManager : Singleton<ARDrawManager>
     /// 序列化数据
     private static byte[] SerializeLinesData(List<ARLine> lineData)
     {
-        var json = JsonUtility.ToJson(lineData);
+        JsonSerializerSettings settings = new JsonSerializerSettings
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+        
+        List<SerializableLineData> lineDataToSend = new List<SerializableLineData>();
+        foreach (ARLine line in lineData)
+        {
+            lineDataToSend.Add(new SerializableLineData(line));
+        }
+        string json = JsonConvert.SerializeObject(lineDataToSend, settings);
         return System.Text.Encoding.UTF8.GetBytes(json);
     }
     
-    private static List<ARLine> DeserializeLinesData(byte[] data)
+    private static List<SerializableLineData> DeserializeLinesData(byte[] data)
     {
         var json = System.Text.Encoding.UTF8.GetString(data);
-        return JsonUtility.FromJson<List<ARLine>>(json);
+        return JsonConvert.DeserializeObject<List<SerializableLineData>>(json);
     }
     
     /// 发送数据
@@ -141,16 +156,20 @@ public class ARDrawManager : Singleton<ARDrawManager>
     #endif
     }
     
-    private void HandleReceiveLinesData(byte[] data)
+    public void HandleReceiveLinesData(byte[] data)
     {
-        List<ARLine> lineData = DeserializeLinesData(data);
-        foreach (ARLine line in lineData)
+        List<SerializableLineData> lineData = DeserializeLinesData(data);
+        ARDebugManager.Instance.LogInfo($"Received {lineData.Count} lines");
+        foreach (SerializableLineData line in lineData)
         {
             ARLine newLine = new ARLine(lineSettings);
             lines.Add(newLine);
-            newLine.AddNewLineRenderer(line.LineRendererObject);
+            newLine.AddNewLineRenderer(line);
         }
+        ARDebugManager.Instance.LogInfo($"Total number of lines is {lines.Count} now");
     }
+    
+    
 
 }
 
