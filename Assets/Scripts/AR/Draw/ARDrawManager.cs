@@ -15,6 +15,7 @@ public class ARDrawManager : Singleton<ARDrawManager>
     [SerializeField] private Camera arCamera;
     private List<ARAnchor> anchors = new List<ARAnchor>();
     private List<ARLine> lines = new List<ARLine>();
+    private ARLine currentLine;
     private bool CanDraw { get; set; }
 
     void Update()
@@ -52,17 +53,17 @@ public class ARDrawManager : Singleton<ARDrawManager>
                 anchors.Add(anchor);
                 ARDebugManager.Instance.LogInfo($"Anchor created & total of {anchors.Count} anchor(s)");
             }
-            ARLine line = new ARLine(lineSettings);
-            lines.Add(line);
-            line.AddNewLineRenderer(transform, anchor, touchPosition);
+            currentLine = new ARLine(lineSettings);
+            currentLine.AddNewLineRenderer(transform, anchor, touchPosition);
         }
         else if(touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
         {
-            lines[0].AddPoint(touchPosition);
+            currentLine.AddPoint(touchPosition);
         }
         else if(touch.phase == TouchPhase.Ended)
         {
-            lines.RemoveAt(0);
+            lines.Add(currentLine);
+            SendCurrentLinesData();
         }
     }
     
@@ -108,5 +109,36 @@ public class ARDrawManager : Singleton<ARDrawManager>
         }
         lines.Clear();
     }
+    
+    /// 序列化数据
+    private static byte[] SerializeLinesData(List<ARLine> lineData)
+    {
+        var json = JsonUtility.ToJson(lineData);
+        return System.Text.Encoding.UTF8.GetBytes(json);
+    }
+    
+    private static List<ARLine> DeserializeLinesData(byte[] data)
+    {
+        var json = System.Text.Encoding.UTF8.GetString(data);
+        return JsonUtility.FromJson<List<ARLine>>(json);
+    }
+    
+    /// 发送数据
+    public void SendCurrentLinesData()
+    {
+        byte[] data = SerializeLinesData(lines); // 序列化
+    }
+    
+    public void OnReceiveLineData(byte[] data)
+    {
+        List<ARLine> lineData = DeserializeLinesData(data);
+        foreach (ARLine line in lineData)
+        {
+            ARLine newLine = new ARLine(lineSettings);
+            lines.Add(newLine);
+            newLine.AddNewLineRenderer(line.LineRendererObject);
+        }
+    }
+
 }
 

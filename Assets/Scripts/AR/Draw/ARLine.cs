@@ -8,6 +8,7 @@ public class ARLine
     private Vector3 prevPointDistance = Vector3.zero;
     
     private LineRenderer LineRenderer { get; set; }
+    public GameObject LineRendererObject { get; set; }
 
     private LineSettings settings;
 
@@ -66,7 +67,23 @@ public class ARLine
         goLineRenderer.SetPosition(1, position);
 
         LineRenderer = goLineRenderer;
+        LineRendererObject = go;
 
         ARDebugManager.Instance.LogInfo($"New line renderer created");
     } 
+    
+    public void AddNewLineRenderer(GameObject lr)
+    {
+        GameObject go = new GameObject($"LineRenderer");
+
+        go.transform.parent = lr.transform;
+        go.transform.position = lr.transform.position;
+        go.tag = settings.lineTagName;
+        
+        LineRenderer goLineRenderer = go.AddComponent<LineRenderer>();
+        goLineRenderer = lr.GetComponent<LineRenderer>();
+        LineRenderer = goLineRenderer;
+
+        ARDebugManager.Instance.LogInfo($"New received line renderer created");
+    }
 }
