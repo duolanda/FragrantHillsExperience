@@ -43,9 +43,11 @@ public class ARLine
     public void AddNewLineRenderer(Transform parent, ARAnchor anchor, Vector3 position)
     {
         positionCount = 2;
+        GameObject remote = GameObject.Find("RemoteLineRenderer");
         GameObject go = new GameObject($"LineRenderer");
         
-        go.transform.parent = anchor?.transform ?? parent;
+        // go.transform.parent = anchor?.transform ?? parent;
+        go.transform.parent = remote.transform;
         go.transform.position = position;
         go.tag = settings.lineTagName;
         

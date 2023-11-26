@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using Unity.Collections;
 
 #if UNITY_IOS && !UNITY_EDITOR
 using Unity.iOS.Multipeer;
 using UnityEngine.XR.ARKit;
+using System;
 #endif
 
 [RequireComponent(typeof(ARSession))]
@@ -135,6 +137,34 @@ public class CollaborativeSession : MonoBehaviour
     void OnDestroy()
     {
         m_MCSession.Dispose();
+    }
+    
+    public void SendLinesData(byte[] lineData)
+    {
+        if (m_MCSession.ConnectedPeerCount > 0)
+        {
+            NativeArray<byte> nativeArray = new NativeArray<byte>(lineData, Allocator.Temp);
+            NativeSlice<byte> nativeSlice = new NativeSlice<byte>(nativeArray);
+            m_MCSession.SendToAllPeers(NSData.CreateWithBytesNoCopy(nativeSlice), MCSessionSendDataMode.Reliable);
+            nativeArray.Dispose();
+        }
+    }
+
+    public void ReceiveLinesData(Action<byte[]> onLineDataReceived)
+    {
+        while (m_MCSession.ReceivedDataQueueSize > 0)
+        {
+            using (var data = m_MCSession.DequeueReceivedData())
+            {
+                NativeSlice<byte> nativeSlice = data.Bytes;
+                byte[] byteArray = new byte[nativeSlice.Length];
+                for (int i = 0; i < nativeSlice.Length; i++)
+                {
+                    byteArray[i] = data.Bytes[i];
+                }
+                onLineDataReceived?.Invoke(byteArray);
+            }
+        }
     }
 #endif
 }

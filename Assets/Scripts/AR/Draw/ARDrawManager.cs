@@ -17,11 +17,18 @@ public class ARDrawManager : Singleton<ARDrawManager>
     private List<ARLine> lines = new List<ARLine>();
     private ARLine currentLine;
     private bool CanDraw { get; set; }
-
+    private CollaborativeSession collaborativeSession;
+    
+    void Start()
+    {
+        collaborativeSession = FindObjectOfType<CollaborativeSession>();
+    }
+    
     void Update()
     {
     #if !UNITY_EDITOR    
         DrawOnTouch();
+        collaborativeSession?.ReceiveLinesData(HandleReceiveLinesData);
     #else
         DrawOnMouse();
     #endif
@@ -124,12 +131,17 @@ public class ARDrawManager : Singleton<ARDrawManager>
     }
     
     /// 发送数据
-    public void SendCurrentLinesData()
+    private void SendCurrentLinesData()
     {
-        byte[] data = SerializeLinesData(lines); // 序列化
+    #if UNITY_IOS && !UNITY_EDITOR
+        byte[] serializedData = SerializeLinesData(lines);
+        collaborativeSession?.SendLinesData(serializedData);
+    #else
+        Debug.Log("Collaborative sessions are an ARKit 3 feature; This platform does not support them.");
+    #endif
     }
     
-    public void OnReceiveLineData(byte[] data)
+    private void HandleReceiveLinesData(byte[] data)
     {
         List<ARLine> lineData = DeserializeLinesData(data);
         foreach (ARLine line in lineData)
