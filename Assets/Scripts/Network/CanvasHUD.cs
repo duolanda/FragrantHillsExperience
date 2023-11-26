@@ -7,7 +7,7 @@ public class CanvasHUD : MonoBehaviour
 {
     public GameObject PanelStart;
     public GameObject PanelStop;
-    public Canvas ChatCanvas;
+    public GameObject Chat;
     
     public Button buttonHost, buttonServer, buttonClient, buttonStop;
 
@@ -90,21 +90,21 @@ public class CanvasHUD : MonoBehaviour
             if (NetworkClient.active)
             {
                 PanelStart.SetActive(false);
-                // ChatCanvas.gameObject.SetActive(true);
+                Chat.gameObject.SetActive(true);
                 PanelStop.SetActive(true);
                 clientText.text = "Connecting to " + NetworkManager.singleton.networkAddress + "..";
             }
             else
             {
                 PanelStart.SetActive(true);
-                // ChatCanvas.gameObject.SetActive(false);
+                Chat.gameObject.SetActive(false);
                 PanelStop.SetActive(false);
             }
         }
         else
         {
             PanelStart.SetActive(false);
-            // ChatCanvas.gameObject.SetActive(true);
+            Chat.gameObject.SetActive(true);
             PanelStop.SetActive(true);
 
             // server / client status message

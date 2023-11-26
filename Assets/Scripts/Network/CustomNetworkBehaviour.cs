@@ -32,6 +32,7 @@ public class CustomNetworkBehaviour : NetworkBehaviour
     // 有新消息时，更新文本框
     private void HandleNewMessage(string message)
     {
+        Debug.Log("Text Updated");
         chatText.text += message;
     }
 
@@ -40,6 +41,7 @@ public class CustomNetworkBehaviour : NetworkBehaviour
     public void Send()
     {
         if (string.IsNullOrWhiteSpace(inputField.text)) { return; }
+        Debug.Log("Prepare to send message");
         CmdSendMessage(inputField.text);
         inputField.text = string.Empty;
     }
@@ -55,6 +57,7 @@ public class CustomNetworkBehaviour : NetworkBehaviour
     private void RpcHandleMessage(string message)
     {
         OnMessage?.Invoke($"\n{message}");
+        Debug.Log("Success send a message");
     }
 
 }
