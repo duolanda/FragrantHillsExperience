@@ -27,10 +27,10 @@ public class ARDrawManager : Singleton<ARDrawManager>
     void Start()
     {
         collaborativeSession = FindObjectOfType<CollaborativeSession>();
-        string json =
-        "{\"lineDataList\":[{\"points\":[{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873},{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873}]}]}";
-        byte[] serializedData = System.Text.Encoding.UTF8.GetBytes(json);
-        HandleReceiveLinesData(serializedData);
+        // string json =
+        // "{\"lineDataList\":[{\"points\":[{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873},{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873}]}]}";
+        // byte[] serializedData = System.Text.Encoding.UTF8.GetBytes(json);
+        // HandleReceiveLinesData(serializedData);
     }
     
     void Update()
