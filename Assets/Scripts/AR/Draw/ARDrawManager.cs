@@ -16,6 +16,7 @@ public class ARDrawManager : Singleton<ARDrawManager>
     [SerializeField] private Camera arCamera;
     private List<ARAnchor> anchors = new List<ARAnchor>();
     private List<ARLine> lines = new List<ARLine>();
+    private List<ARLine> mouseLines = new List<ARLine>();
     private ARLine currentLine;
     private bool CanDraw { get; set; }
     private CollaborativeSession collaborativeSession;
@@ -26,6 +27,9 @@ public class ARDrawManager : Singleton<ARDrawManager>
     void Start()
     {
         collaborativeSession = FindObjectOfType<CollaborativeSession>();
+        string json =
+            "{\"lineDataList\":[{\"points\":[{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873},{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873}]}]}";
+        List<SerializableLineData> data =JsonConvert.DeserializeObject<List<SerializableLineData>>(json);
     }
     
     void Update()
@@ -89,20 +93,21 @@ public class ARDrawManager : Singleton<ARDrawManager>
         {
             OnDraw?.Invoke();
 
-            if(lines.Count == 0)
+            if(mouseLines.Count == 0)
             {
-                ARLine line = new ARLine(lineSettings);
-                lines.Add(line);
-                line.AddNewLineRenderer(transform, null, mousePosition);
+                currentLine = new ARLine(lineSettings);
+                mouseLines.Add(currentLine);
+                currentLine.AddNewLineRenderer(transform, null, mousePosition);
             }
             else 
             {
-                lines[0].AddPoint(mousePosition);
+                currentLine.AddPoint(mousePosition);
             }
         }
         else if(Input.GetMouseButtonUp(0))
         {
-            lines.RemoveAt(0);   
+            mouseLines.RemoveAt(0);
+            lines.Add(currentLine);
         }
     }
 
@@ -125,24 +130,21 @@ public class ARDrawManager : Singleton<ARDrawManager>
     /// 序列化数据
     private static byte[] SerializeLinesData(List<ARLine> lineData)
     {
-        JsonSerializerSettings settings = new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
-        
-        List<SerializableLineData> lineDataToSend = new List<SerializableLineData>();
+        LineDataContainer container = new LineDataContainer();
         foreach (ARLine line in lineData)
         {
-            lineDataToSend.Add(new SerializableLineData(line));
+            container.lineDataList.Add(new SerializableLineData(line));
         }
-        string json = JsonConvert.SerializeObject(lineDataToSend, settings);
+        string json = JsonConvert.SerializeObject(container);
         return System.Text.Encoding.UTF8.GetBytes(json);
     }
     
     private static List<SerializableLineData> DeserializeLinesData(byte[] data)
     {
-        var json = System.Text.Encoding.UTF8.GetString(data);
-        return JsonConvert.DeserializeObject<List<SerializableLineData>>(json);
+        string json = System.Text.Encoding.UTF8.GetString(data);
+        Debug.Log($"Deserialize json: {json}");
+        LineDataContainer container = JsonConvert.DeserializeObject<LineDataContainer>(json);
+        return container?.lineDataList ?? new List<SerializableLineData>();
     }
     
     /// 发送数据
@@ -168,8 +170,5 @@ public class ARDrawManager : Singleton<ARDrawManager>
         }
         ARDebugManager.Instance.LogInfo($"Total number of lines is {lines.Count} now");
     }
-    
-    
-
 }
 

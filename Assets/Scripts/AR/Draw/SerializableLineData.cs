@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,25 +6,42 @@ using UnityEngine;
 [System.Serializable]
 public class SerializableLineData
 {
-    public List<Vector3> points;
-    // public Color startColor;
-    // public Color endColor;
-    // public float startWidth;
-    // public float endWidth;
-    // 可以添加其他必要的字段
+    public List<SerializableVector3> points;
 
     public SerializableLineData(ARLine arLine)
     {
-        // 从 arLine 中提取必要的信息
-        this.points = new List<Vector3>(); // 假设您存储了线条的点
+        if (arLine == null || arLine.LineRenderer == null)
+        {
+            Debug.Log($"arLine:{arLine}");
+            Debug.Log($"LineRenderer:{arLine.LineRenderer}");
+            // throw new ArgumentNullException("ARLine or its LineRenderer is null.");
+        }
+        
+        points = new List<SerializableVector3>();
         for (int i = 0; i < arLine.LineRenderer.positionCount; i++)
         {
-            this.points.Add(arLine.LineRenderer.GetPosition(i));
+            points.Add(new SerializableVector3(arLine.LineRenderer.GetPosition(i)));
         }
-        // this.startColor = arLine.LineRenderer.startColor;
-        // this.endColor = arLine.LineRenderer.endColor;
-        // this.startWidth = arLine.LineRenderer.startWidth;
-        // this.endWidth = arLine.LineRenderer.endWidth;
-        // 设置其他字段...
+    }
+}
+
+[System.Serializable]
+public class LineDataContainer
+{
+    public List<SerializableLineData> lineDataList = new List<SerializableLineData>();
+}
+
+[System.Serializable]
+public class SerializableVector3
+{
+    public float x;
+    public float y;
+    public float z;
+
+    public SerializableVector3(Vector3 vector3)
+    {
+        x = vector3.x;
+        y = vector3.y;
+        z = vector3.z;
     }
 }

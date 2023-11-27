@@ -83,12 +83,10 @@ public class ARLine
         goLineRenderer.positionCount = deserializedData.points.Count;
         for (int i = 0; i < deserializedData.points.Count; i++)
         {
-            goLineRenderer.SetPosition(i, deserializedData.points[i]);
+            SerializableVector3 pointPosition = deserializedData.points[i];
+            Vector3 position = new Vector3(pointPosition.x, pointPosition.y, pointPosition.z);
+            goLineRenderer.SetPosition(i, position);
         }
-        // goLineRenderer.startColor = deserializedData.startColor;
-        // goLineRenderer.endColor = deserializedData.endColor;
-        // goLineRenderer.startWidth = deserializedData.startWidth;
-        // goLineRenderer.endWidth = deserializedData.endWidth;
         
         LineRenderer = goLineRenderer;
 
