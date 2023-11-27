@@ -77,8 +77,6 @@ namespace UnityEngine.XR.ARFoundation.Samples
                         bytes.data[12] / 255f);
                 }
             }
-            ARSessionOriginAlignment.Instance.InitSharedAnchor(anchor);
-            ARSessionOriginAlignment.Instance.AlignWithSharedAnchor();
         }
     }
 }
