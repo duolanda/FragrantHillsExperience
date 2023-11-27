@@ -27,9 +27,9 @@ public class ARDrawManager : Singleton<ARDrawManager>
     void Start()
     {
         collaborativeSession = FindObjectOfType<CollaborativeSession>();
-        string json =
-            "{\"lineDataList\":[{\"points\":[{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873},{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873}]}]}";
-        List<SerializableLineData> data =JsonConvert.DeserializeObject<List<SerializableLineData>>(json);
+        // string json =
+        //     "{\"lineDataList\":[{\"points\":[{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873},{\"x\":1042.10107,\"y\":697.8027,\"z\":-12.7342873}]}]}";
+        // LineDataContainer container = JsonUtility.FromJson<LineDataContainer>(json);
     }
     
     void Update()
@@ -135,7 +135,7 @@ public class ARDrawManager : Singleton<ARDrawManager>
         {
             container.lineDataList.Add(new SerializableLineData(line));
         }
-        string json = JsonConvert.SerializeObject(container);
+        string json = JsonUtility.ToJson(container);
         return System.Text.Encoding.UTF8.GetBytes(json);
     }
     
@@ -143,7 +143,7 @@ public class ARDrawManager : Singleton<ARDrawManager>
     {
         string json = System.Text.Encoding.UTF8.GetString(data);
         Debug.Log($"Deserialize json: {json}");
-        LineDataContainer container = JsonConvert.DeserializeObject<LineDataContainer>(json);
+        LineDataContainer container = JsonUtility.FromJson<LineDataContainer>(json);
         return container?.lineDataList ?? new List<SerializableLineData>();
     }
     
