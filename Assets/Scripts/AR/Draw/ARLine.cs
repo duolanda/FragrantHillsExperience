@@ -8,6 +8,7 @@ public class ARLine
     private Vector3 prevPointDistance = Vector3.zero;
     
     public LineRenderer LineRenderer { get; set; }
+    public Vector3 ParentPosition;
     private LineSettings settings;
     
 
@@ -47,6 +48,8 @@ public class ARLine
         go.transform.parent = anchor?.transform ?? parent;
         go.transform.position = position;
         go.tag = settings.lineTagName;
+
+        ParentPosition = go.transform.position;
         
         LineRenderer goLineRenderer = go.AddComponent<LineRenderer>();
         goLineRenderer.startWidth = settings.startWidth;
@@ -75,10 +78,23 @@ public class ARLine
         GameObject go = new GameObject($"LineRenderer");
 
         // go.transform.parent = lr.transform;
-        // go.transform.position = lr.transform.position;
+        go.transform.position = new Vector3(deserializedData.parentPosition.x,deserializedData.parentPosition.y,deserializedData.parentPosition.z);
         go.tag = settings.lineTagName;
         
         LineRenderer goLineRenderer = go.AddComponent<LineRenderer>();
+        
+        goLineRenderer.startWidth = settings.startWidth;
+        goLineRenderer.endWidth = settings.endWidth;
+
+        goLineRenderer.startColor = settings.startColor;
+        goLineRenderer.endColor = settings.endColor;
+
+        goLineRenderer.material = settings.defaultMaterial;
+        goLineRenderer.useWorldSpace = true;
+        goLineRenderer.positionCount = positionCount;
+
+        goLineRenderer.numCornerVertices = settings.cornerVertices;
+        goLineRenderer.numCapVertices = settings.endCapVertices;
         
         goLineRenderer.positionCount = deserializedData.points.Count;
         for (int i = 0; i < deserializedData.points.Count; i++)

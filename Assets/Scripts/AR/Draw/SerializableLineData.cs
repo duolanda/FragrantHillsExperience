@@ -7,21 +7,17 @@ using UnityEngine;
 public class SerializableLineData
 {
     public List<SerializableVector3> points;
+    public SerializableVector3 parentPosition;
 
     public SerializableLineData(ARLine arLine)
     {
-        if (arLine == null || arLine.LineRenderer == null)
-        {
-            Debug.Log($"arLine:{arLine}");
-            Debug.Log($"LineRenderer:{arLine.LineRenderer}");
-            // throw new ArgumentNullException("ARLine or its LineRenderer is null.");
-        }
-        
         points = new List<SerializableVector3>();
         for (int i = 0; i < arLine.LineRenderer.positionCount; i++)
         {
             points.Add(new SerializableVector3(arLine.LineRenderer.GetPosition(i)));
         }
+
+        parentPosition = new SerializableVector3(arLine.ParentPosition);
     }
 }
 
