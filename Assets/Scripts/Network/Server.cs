@@ -1,6 +1,7 @@
 // Server.cs
 using UnityEngine;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -16,7 +17,17 @@ public class Server : MonoBehaviour
     private TcpListener tcpListener;
     private List<TcpClient> clients = new List<TcpClient>();
     private bool isRunning = false;
+    private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
 
+    
+    void Update()
+    {
+        while (messageQueue.TryDequeue(out string message))
+        {
+            statusText.text += "\n" + message;
+        }
+    }
+    
     public void StartServer()
     {
         if (isRunning) return;
@@ -96,10 +107,7 @@ public class Server : MonoBehaviour
     {
         Debug.Log(message);
         // Since this method is called from another thread, we need to use Unity's main thread to update the UI
-        // lock (statusText)
-        // {
-        //     statusText.text += "\n" + message;
-        // }
+        messageQueue.Enqueue(message);
     }
 
     private void OnApplicationQuit()
