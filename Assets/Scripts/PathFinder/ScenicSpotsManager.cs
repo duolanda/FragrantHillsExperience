@@ -23,7 +23,8 @@ public class ScenicSpotsManager : MonoBehaviour {
         ImportScenicSpots();
         
         List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,44,35,32,28,21,4,3});
-
+        // List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,20,14,9,51});
+        
         pathDrawer.DrawPath(result);
 
         foreach (ScenicSpot spot in result)
@@ -66,9 +67,10 @@ public class ScenicSpotsManager : MonoBehaviour {
             ScenicSpot currentSpot = spotsDictionary[spotIDs[i]];
             ScenicSpot nextSpot = spotsDictionary[spotIDs[i + 1]];
 
-            List<ScenicSpot> subPath = GetPathBetweenSpots(currentSpot, nextSpot); // 使用你的路径查找算法
+            List<ScenicSpot> subPath = GetPathBetweenSpots(currentSpot, nextSpot);
             path.AddRange(subPath);
         }
+        path.Insert(0, spotsDictionary[spotIDs[0]]);
         return path;
     }
 

@@ -1,4 +1,3 @@
-// Client.cs
 using UnityEngine;
 using System.Collections.Generic;
 using System.Net.Sockets;

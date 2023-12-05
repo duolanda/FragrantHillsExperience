@@ -1,4 +1,3 @@
-// Server.cs
 using UnityEngine;
 using System;
 using System.Collections.Concurrent;
@@ -6,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using TMPro;
 
@@ -19,7 +19,17 @@ public class Server : MonoBehaviour
     private bool isRunning = false;
     private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
 
-    
+    private Dictionary<int, ScenicSpot> spotsDictionary;
+
+    private void Start()
+    {
+        //索引转为经典名
+        string json = File.ReadAllText(Application.dataPath + "/Json/ScenicSpots.json");
+        ScenicSpot[] spotsArray = JsonHelper.FromJson<ScenicSpot>(json);
+        List<ScenicSpot> scenicSpots = new List<ScenicSpot>(spotsArray);
+        spotsDictionary = scenicSpots.ToDictionary(spot => spot.id, spot => spot);
+    }
+
     void Update()
     {
         while (messageQueue.TryDequeue(out string message))
@@ -86,12 +96,20 @@ public class Server : MonoBehaviour
                         {
                             numbers.Add(reader.ReadInt32());
                         }
-                        UpdateStatusText($"Received from {endPoint}: {string.Join(", ", numbers)}");
+
+                        List<string> spots = new List<string>();
+                        foreach (int number in numbers)
+                        {
+                            ScenicSpot spot;
+                            spot = spotsDictionary[number];
+                            spots.Add(spot.name);
+                        }
+                        UpdateStatusText($"Received from {endPoint}: {string.Join(", ", spots)}");
                     }
                 }
                 catch (Exception e)
                 {
-                    UpdateStatusText($"Client {endPoint} error: {e.Message}");
+                    Debug.Log($"Client {endPoint} error: {e.Message}");
                 }
             }
         }
