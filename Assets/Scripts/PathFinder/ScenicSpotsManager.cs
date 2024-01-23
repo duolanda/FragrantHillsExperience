@@ -10,27 +10,18 @@ public class ScenicSpotsManager : MonoBehaviour {
     public PathDrawer pathDrawer;
 
     void Start() {
-        // // 手动添加景点和邻居
-        // scenicSpots = new List<ScenicSpot>();
-        
-        // var spot1 = new ScenicSpot("景点1", new Vector3(0, 0, 0));
-        // var spot2 = new ScenicSpot("景点2", new Vector3(10, 0, 0));
-        // scenicSpots.Add(spot1);
-        // scenicSpots.Add(spot2);
-        //
-        // 
-        // spot1.AddNeighbor(spot2); // 景点1与景点2相连
         ImportScenicSpots();
         
         List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,44,35,32,28,21,4,3});
         // List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,20,14,9,51});
         
-        pathDrawer.DrawPath(result);
+        //pathDrawer.DrawPath(result);
 
-        foreach (ScenicSpot spot in result)
-        {
-            Debug.Log(spot.name);
-        }
+        //输出导入的景点
+        //foreach (ScenicSpot spot in result)
+        //{
+        //    Debug.Log(spot.name);
+        //}
     }
     
     void ImportScenicSpots() {

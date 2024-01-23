@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ARCollaborationData/ARCollaborationDataExample.unity
     guid: 900e7bfe6122645fba71b90941afb9c5
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Draw.unity
     guid: 637834fa0aae845aa809437f1b4f56b0
   - enabled: 0

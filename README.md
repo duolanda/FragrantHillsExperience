@@ -31,6 +31,12 @@ A Unity program that people can enjoy when they visit the Fragrant Hills（香�
 
   - [ ] Calibration the Line on different device
 
-- [ ] Pose estimation by Kinect
+- [ ] Interaction based on Kinect
+  - [ ] Cursor to choose scenic spots
+  - [ ] Scene changing gesture
+  - [ ] Support multi-user check scenic spots synchronously
+  - [ ] Fire extinguishing multi-player game
+
+
 
   
