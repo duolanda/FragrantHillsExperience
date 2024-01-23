@@ -1,7 +1,6 @@
 # Custom
-.idea/
-.DS_Store
-
+.*
+!/.gitignore
 
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
