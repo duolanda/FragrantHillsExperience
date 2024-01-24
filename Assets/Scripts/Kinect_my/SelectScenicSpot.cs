@@ -84,6 +84,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
             {
                 Debug.Log("检测到碰撞了");
                 ShowHoverAt(scenicSpot.transform.position);
+                Debug.Log(scenicSpot.transform.position);
                 activeScenicSpot = scenicSpot;
                 isCursorNearObject = true;
                 break;
@@ -103,7 +104,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         if (collider == null) return false;
 
         Vector3 cursorPosition = GetCursorPosition();
-        Debug.Log("世界位置" + cursorPosition);
         return collider.bounds.Contains(cursorPosition);
     }
 
@@ -115,16 +115,20 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         Vector3 screenPixelPos = new Vector3(
             screenNormalPos.x * (screenCamera ? screenCamera.pixelWidth : Screen.width),
             screenNormalPos.y * (screenCamera ? screenCamera.pixelHeight : Screen.height),
-            0.0f
+            screenCamera.nearClipPlane
         );
-        Debug.Log("屏幕位置" + screenPixelPos);
-        return screenCamera.ScreenToWorldPoint(screenPixelPos);
+        Vector3 worldPos = screenCamera.ScreenToWorldPoint(screenPixelPos);
+        return new Vector3(worldPos.x, worldPos.y, 0.0f);
     }
 
     private void ShowHoverAt(Vector3 position)
     {
+        // GUI 元素需要使用屏幕坐标
+        Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
+        Debug.Log("屏幕坐标" + screenPosition);
+
         hoverDisplay.SetActive(true);
-        hoverDisplay.transform.position = position;
+        hoverDisplay.transform.position = screenPosition;
     }
 
     private void HideHover()
