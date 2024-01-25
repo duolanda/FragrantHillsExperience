@@ -6,6 +6,7 @@ TagManager:
   tags:
   - GameController
   - Line
+  - InfoPanel
   layers:
   - Default
   - TransparentFX

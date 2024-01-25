@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 {
@@ -29,8 +32,20 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private GameObject activeScenicSpot;
 
     private InteractionManager interactionManager;
+    private MapGestureListener gestureListener;
+
+    private GraphicRaycaster raycaster;
+    private EventSystem eventSystem;
+
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
+    private bool isWaitingClose = false;
+
+    void Awake()
+    {
+        raycaster = canvas.GetComponent<GraphicRaycaster>();
+        eventSystem = canvas.GetComponent<EventSystem>();
+    }
 
     void Start()
     {
@@ -51,12 +66,14 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         {
             interactionManager = GetInteractionManager();
         }
+        //gestureListener = MapGestureListener.Instance;
 
     }
 
     void Update()
     {
         HandleHoverDisplay();
+        HandlePanelClose();
     }
 
     private InteractionManager GetInteractionManager()
@@ -75,8 +92,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                 }
             }
         }
-
-        // not found
         return null;
     }
 
@@ -86,7 +101,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         {
             if (IsCursorNearObject(scenicSpot))
             {
-                CreatePanelAt(scenicSpot.transform.position);
+                CreatePanelAt(scenicSpot.transform.position, scenicSpot.name);
                 break;
             }
         }
@@ -112,6 +127,37 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         {
             HideHover();
             activeScenicSpot = null;
+        }
+    }
+
+    private void HandlePanelClose()
+    {
+        //检测按下动作，注意，目前只检测右手
+        if (!interactionManager.IsRightHandPress() || isWaitingClose)
+        {
+            return;
+        }
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        PointerEventData pointerEventData = new PointerEventData(eventSystem);
+
+        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
+        raycaster.Raycast(pointerEventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            Debug.Log("检测到了哪些 UI 元素" + result.gameObject);
+            // 检测到的UI元素
+            GameObject hitObject = result.gameObject;
+
+            // 通过标签检查是否是面板
+            if (hitObject.CompareTag("InfoPanel"))
+            {
+                //hitObject.SetActive(false);
+                Destroy(hitObject);
+                StartCoroutine(WaitBeforeNextClose()); // 等2s再关下一个，避免连续关闭
+                break;
+            }
         }
     }
 
@@ -153,15 +199,25 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     }
 
 
-    private void CreatePanelAt(Vector3 position)
+    private void CreatePanelAt(Vector3 position, string scenicSpotName)
     {
+        //创建面板
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
         GameObject infoPanel = Instantiate(infoPanelPrefab, screenPosition, Quaternion.identity);
         infoPanel.transform.SetParent(canvas.transform, true);
+        infoPanel.transform.SetAsFirstSibling();
 
-        //Vector2 worldPosition;
-        //RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, null, out worldPosition);
-        //infoPanel.GetComponent<RectTransform>().localPosition = worldPosition;
+        //修改景点名称
+        Transform ScenicNameTransform = infoPanel.transform.Find("ScenicNameText");
+        TextMeshProUGUI ScenicNameText = ScenicNameTransform.GetComponent<TextMeshProUGUI>();
+        ScenicNameText.text = scenicSpotName;
+    }
+
+    IEnumerator WaitBeforeNextClose()
+    {
+        isWaitingClose = true; 
+        yield return new WaitForSeconds(2f); // 等待2秒
+        isWaitingClose = false; 
     }
 
     public void HandGripDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
