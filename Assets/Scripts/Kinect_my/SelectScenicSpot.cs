@@ -19,6 +19,12 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     [Tooltip("Whether the right hand interaction is allowed by the respective InteractionManager.")]
     public bool rightHandInteraction = true;
 
+    [Tooltip("Panel for showing scenic spot informaiton.")]
+    public GameObject infoPanelPrefab;
+
+    [Tooltip("Canvas for this scene")]
+    public Canvas canvas;
+
     private List<GameObject> scenicSpots = new List<GameObject>();
     private GameObject activeScenicSpot;
 
@@ -74,6 +80,19 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         return null;
     }
 
+    private void HandleInfoPanel()
+    {
+        foreach (GameObject scenicSpot in scenicSpots)
+        {
+            if (IsCursorNearObject(scenicSpot))
+            {
+                CreatePanelAt(scenicSpot.transform.position);
+                break;
+            }
+        }
+
+    }
+
     private void HandleHoverDisplay()
     {
         bool isCursorNearObject = false;
@@ -82,9 +101,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         {
             if (IsCursorNearObject(scenicSpot))
             {
-                Debug.Log("检测到碰撞了");
                 ShowHoverAt(scenicSpot.transform.position);
-                Debug.Log(scenicSpot.transform.position);
                 activeScenicSpot = scenicSpot;
                 isCursorNearObject = true;
                 break;
@@ -125,7 +142,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     {
         // GUI 元素需要使用屏幕坐标
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
-        Debug.Log("屏幕坐标" + screenPosition);
 
         hoverDisplay.SetActive(true);
         hoverDisplay.transform.position = screenPosition;
@@ -134,6 +150,18 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private void HideHover()
     {
         hoverDisplay.SetActive(false);
+    }
+
+
+    private void CreatePanelAt(Vector3 position)
+    {
+        Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
+        GameObject infoPanel = Instantiate(infoPanelPrefab, screenPosition, Quaternion.identity);
+        infoPanel.transform.SetParent(canvas.transform, true);
+
+        //Vector2 worldPosition;
+        //RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, null, out worldPosition);
+        //infoPanel.GetComponent<RectTransform>().localPosition = worldPosition;
     }
 
     public void HandGripDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
@@ -146,6 +174,8 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         lastHandEvent = InteractionManager.HandEventType.Grip;
         //isLeftHandDrag = !isRightHand;
         screenNormalPos = handScreenPos;
+
+        HandleInfoPanel();
     }
 
     public void HandReleaseDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
