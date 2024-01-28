@@ -66,6 +66,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         {
             interactionManager = GetInteractionManager();
         }
+
         //gestureListener = MapGestureListener.Instance;
 
     }

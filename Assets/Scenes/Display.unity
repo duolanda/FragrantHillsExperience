@@ -2471,6 +2471,8 @@ GameObject:
   - component: {fileID: 1363732019}
   - component: {fileID: 1363732018}
   - component: {fileID: 1363732021}
+  - component: {fileID: 1363732023}
+  - component: {fileID: 1363732022}
   m_Layer: 0
   m_Name: KinectController
   m_TagString: Untagged
@@ -2595,6 +2597,32 @@ MonoBehaviour:
   rightHandInteraction: 1
   infoPanelPrefab: {fileID: 4604617966022593403, guid: 68ab9dc233320104890150f5f41d335a, type: 3}
   canvas: {fileID: 1288977489}
+--- !u!114 &1363732022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363732016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 905a4c845b1a595479412534ce75e4ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerIndex: 0
+  gestureInfo: {fileID: 558005082}
+--- !u!114 &1363732023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363732016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b976a1901bb5d478901026c07729cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1386956834
 GameObject:
   m_ObjectHideFlags: 0

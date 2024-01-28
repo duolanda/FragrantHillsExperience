@@ -39,6 +39,7 @@ public class MapGestureListener : MonoBehaviour, KinectGestures.GestureListenerI
 		if (stopGesture)
 		{
 			stopGesture = false;
+			gestureInfo.text = "isStop";
 			return true;
 		}
 
