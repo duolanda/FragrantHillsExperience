@@ -147,7 +147,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
         foreach (RaycastResult result in results)
         {
-            Debug.Log("检测到了哪些 UI 元素" + result.gameObject);
             // 检测到的UI元素
             GameObject hitObject = result.gameObject;
 
@@ -205,8 +204,8 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         //创建面板
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
         GameObject infoPanel = Instantiate(infoPanelPrefab, screenPosition, Quaternion.identity);
-        infoPanel.transform.SetParent(canvas.transform, true);
-        infoPanel.transform.SetAsFirstSibling();
+        Transform infoPanelset = canvas.transform.Find("InfoPanelSet");
+        infoPanel.transform.SetParent(infoPanelset, true); //创建在特定物件下以保证显示层级
 
         //修改景点名称
         Transform ScenicNameTransform = infoPanel.transform.Find("ScenicNameText");
