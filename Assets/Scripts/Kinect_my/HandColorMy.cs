@@ -3,13 +3,15 @@ using System.Collections;
 //using Windows.Kinect;
 
 
-public class HandColorMy : MonoBehaviour 
+public class HandColorOverlayer : MonoBehaviour 
 {
+//	[Tooltip("GUI-texture used to display the color camera feed on the scene background.")]
+//	public GUITexture backgroundImage;
 
 	[Tooltip("Camera used to estimate the overlay positions of 3D-objects over the background. By default it is the main camera.")]
 	public Camera foregroundCamera;
 	
-	[Tooltip("Index of the player, tracked by this component. 0 means the 1st player.")]
+	[Tooltip("Index of the player, tracked by this component. 0 means the 1st player, 1 - the 2nd one, 2 - the 3rd one, etc.")]
 	public int playerIndex = 0;
 	
 	[Tooltip("Game object used to overlay the left hand.")]
@@ -39,6 +41,13 @@ public class HandColorMy : MonoBehaviour
 
 		if(manager && manager.IsInitialized() && foregroundCamera)
 		{
+//			//backgroundImage.renderer.material.mainTexture = manager.GetUsersClrTex();
+//			if(backgroundImage && (backgroundImage.texture == null))
+//			{
+//				backgroundImage.texture = manager.GetUsersClrTex();
+//			}
+
+			// get the background rectangle (use the portrait background, if available)
 			Rect backgroundRect = foregroundCamera.pixelRect;
 			PortraitBackground portraitBack = PortraitBackground.Instance;
 
@@ -80,6 +89,8 @@ public class HandColorMy : MonoBehaviour
 
 					if (!float.IsInfinity(posColor.x) && !float.IsInfinity(posColor.y)) 
 					{
+//						float xNorm = (float)posColor.x / manager.GetColorImageWidth();
+//						float yNorm = 1.0f - (float)posColor.y / manager.GetColorImageHeight();
 						float xScaled = (float)posColor.x * imageRect.width / manager.GetColorImageWidth();
 						float yScaled = (float)posColor.y * imageRect.height / manager.GetColorImageHeight();
 
@@ -89,6 +100,7 @@ public class HandColorMy : MonoBehaviour
 						if(overlayObj && foregroundCamera)
 						{
 							float distanceToCamera = overlayObj.position.z - foregroundCamera.transform.position.z;
+							//posJoint = foregroundCamera.ViewportToWorldPoint(new Vector3(xNorm, yNorm, distanceToCamera));
 							posJoint = foregroundCamera.ScreenToWorldPoint(new Vector3(xScreen, yScreen, distanceToCamera));
 
 							overlayObj.position = posJoint;
