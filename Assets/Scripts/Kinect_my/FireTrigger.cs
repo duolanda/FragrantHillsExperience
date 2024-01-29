@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class FireTrigger : MonoBehaviour
 {
-	void OnTriggerEnter()
+	void OnTriggerEnter2D(Collider2D collider)
 	{
-		Debug.Log("成功触发");
+		//Debug.Log("成功触发");
+		Destroy(gameObject);
 	}
 }
