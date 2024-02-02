@@ -224,8 +224,13 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     {
         if (!isHandInteracting || !interactionManager)
             return;
-        if (userId != interactionManager.GetUserID())
-            return;
+        Debug.Log("userID£º" + userId);
+        Debug.Log("interactionManager.GetUserID()£º" + interactionManager.GetUserID());
+        Debug.Log("userIndex£º" + userIndex);
+        Debug.Log("·Ö¸îÏß");
+        //if (userId != interactionManager.GetUserID())
+        //    return;
+       
 
         lastHandEvent = InteractionManager.HandEventType.Grip;
         //isLeftHandDrag = !isRightHand;
