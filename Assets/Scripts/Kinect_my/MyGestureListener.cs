@@ -23,6 +23,7 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
     private bool playPiano = false;
     private bool salute = false;
     private bool writeInAir = false;
+    private bool pickRedLeaf = false;
 
 
     /// <summary>
@@ -71,6 +72,7 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
         manager.DetectGesture(userId, KinectGestures.Gestures.PlayPiano);
         manager.DetectGesture(userId, KinectGestures.Gestures.Salute);
         manager.DetectGesture(userId, KinectGestures.Gestures.WriteInAir);
+        manager.DetectGesture(userId, KinectGestures.Gestures.PickRedLeaf);
 
         if (gestureInfo != null)
 		{
@@ -189,6 +191,11 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
         {
             writeInAir = true;
             Debug.Log("在题字");
+        }
+        else if (gesture == KinectGestures.Gestures.PickRedLeaf)
+        {
+            pickRedLeaf = true;
+            Debug.Log("在摘红叶");
         }
 
         return true;

@@ -141,6 +141,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
         PlayPiano,
         Salute,
         WriteInAir,
+        PickRedLeaf,
 
         UserGesture1 = 101,
 		UserGesture2 = 102,
@@ -1928,7 +1929,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 break;
 
             // check for WriteInAir
-            // 好像要满 5s 才做了动作，有点太久了
+            // 要满 5s 才算做了动作，有点太久了
             case Gestures.WriteInAir:
                 switch (gestureData.state)
                 {
@@ -1970,6 +1971,59 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 }
                 break;
 
+            // check for PickRedLeaf
+            case Gestures.PickRedLeaf:
+                switch (gestureData.state)
+                {
+                    case 0:  // gesture detection - phase 1
+                        if (jointsTracked[rightHandIndex] && jointsTracked[shoulderCenterIndex] &&
+                            jointsPos[rightHandIndex].y > jointsPos[shoulderCenterIndex].y &&  // Right hand is above the shoulder center
+                            jointsPos[rightHandIndex].z < jointsPos[shoulderCenterIndex].z)  // Right hand is in front of the shoulder center
+                        {
+                            SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
+                            gestureData.progress = 0.1f;
+                        }
+                        break;
+
+                    case 1:  // gesture phase 2 = moving forward
+                        if ((timestamp - gestureData.timestamp) <= 1.5f)  // Adjust time limit based on desired speed
+                        {
+                            bool isMovingForward = jointsTracked[rightHandIndex] && jointsTracked[shoulderCenterIndex] &&
+                                                   jointsPos[rightHandIndex].z < gestureData.jointPos.z - 0.2f;  // Right hand has moved forward
+
+                            if (isMovingForward)
+                            {
+                                SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
+                                gestureData.progress = 0.5f;
+                            }
+                        }
+                        else
+                        {
+                            // Cancel the gesture if time limit is exceeded
+                            SetGestureCancelled(ref gestureData);
+                        }
+                        break;
+
+                    case 2:  // gesture phase 3 = moving back
+                        if ((timestamp - gestureData.timestamp) <= 1.5f)  // Adjust time limit based on desired speed
+                        {
+                            bool isMovingBack = jointsTracked[rightHandIndex] && jointsTracked[shoulderCenterIndex] &&
+                                                jointsPos[rightHandIndex].z > gestureData.jointPos.z + 0.1f;  // Right hand has moved back
+
+                            if (isMovingBack)
+                            {
+                                Vector3 jointPos = jointsPos[gestureData.joint];
+                                CheckPoseComplete(ref gestureData, timestamp, jointPos, isMovingBack, 0f);
+                            }
+                        }
+                        else
+                        {
+                            // Cancel the gesture if time limit is exceeded
+                            SetGestureCancelled(ref gestureData);
+                        }
+                        break;
+                }
+                break;
 
 
                 // here come more gesture-cases
