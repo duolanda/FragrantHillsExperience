@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 using System;
 //using Windows.Kinect;
@@ -21,6 +21,8 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
 	// whether the needed gesture has been detected or not
     private bool strikeWoodenFish = false;
     private bool playPiano = false;
+    private bool salute = false;
+    private bool writeInAir = false;
 
 
     /// <summary>
@@ -67,8 +69,10 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
 		// detect these user specific gestures
 		manager.DetectGesture(userId, KinectGestures.Gestures.StrikeWoodenFish);
         manager.DetectGesture(userId, KinectGestures.Gestures.PlayPiano);
+        manager.DetectGesture(userId, KinectGestures.Gestures.Salute);
+        manager.DetectGesture(userId, KinectGestures.Gestures.WriteInAir);
 
-		if(gestureInfo != null)
+        if (gestureInfo != null)
 		{
 			gestureInfo.text = "Do something!";
 		}
@@ -169,14 +173,24 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
 		if(gesture == KinectGestures.Gestures.StrikeWoodenFish)
         {
             strikeWoodenFish = true;
-            Debug.Log("ÔÚÇÃÄ¾Óã");
+            Debug.Log("åœ¨æ•²æœ¨é±¼");
         }
         else if (gesture == KinectGestures.Gestures.PlayPiano)
         {
             playPiano = true;
-            Debug.Log("ÔÚµ¯¸ÖÇÙ");
+            Debug.Log("åœ¨å¼¹é’¢ç´");
         }
-            
+        else if (gesture == KinectGestures.Gestures.Salute)
+        {
+            salute = true;
+            Debug.Log("åœ¨æ•¬ç¤¼");
+        }
+        else if (gesture == KinectGestures.Gestures.WriteInAir)
+        {
+            writeInAir = true;
+            Debug.Log("åœ¨é¢˜å­—");
+        }
+
         return true;
 	}
 

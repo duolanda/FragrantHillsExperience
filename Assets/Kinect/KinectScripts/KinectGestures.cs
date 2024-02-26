@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 //using Windows.Kinect;
 
 using System.Collections;
@@ -139,6 +139,8 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
 
         StrikeWoodenFish, // add for fragranthills
         PlayPiano,
+        Salute,
+        WriteInAir,
 
         UserGesture1 = 101,
 		UserGesture2 = 102,
@@ -201,6 +203,9 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
 	protected int leftAnkleIndex;
 	protected int rightAnkleIndex;
 
+    // Add by fei
+    protected int headIndex;
+
 
 	/// <summary>
 	/// Gets the list of gesture joint indexes.
@@ -235,11 +240,14 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
 		
 		leftAnkleIndex = (int)KinectInterop.JointType.AnkleLeft;
 		rightAnkleIndex = (int)KinectInterop.JointType.AnkleRight;
-		
-		int[] neededJointIndexes = {
+
+        headIndex = (int)KinectInterop.JointType.Head;
+
+
+        int[] neededJointIndexes = {
 			leftHandIndex, rightHandIndex, leftFingerIndex, rightFingerIndex, leftElbowIndex, rightElbowIndex, leftShoulderIndex, rightShoulderIndex,
-			hipCenterIndex, shoulderCenterIndex, leftHipIndex, rightHipIndex, leftKneeIndex, rightKneeIndex, leftAnkleIndex, rightAnkleIndex
-		};
+			hipCenterIndex, shoulderCenterIndex, leftHipIndex, rightHipIndex, leftKneeIndex, rightKneeIndex, leftAnkleIndex, rightAnkleIndex, headIndex
+        };
 
 		return neededJointIndexes;
 	}
@@ -1827,6 +1835,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 break;
 
             // check for PlayPiano
+            // 有问题，什么都不干也会弹钢琴
             case Gestures.PlayPiano:
                 switch (gestureData.state)
                 {
@@ -1872,7 +1881,100 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 }
                 break;
 
+            // check for Salute
+            // 应该略低于头部，现在好像是和头部一样高才行
+            case Gestures.Salute:
+                switch (gestureData.state)
+                {
+                    case 0:  // gesture detection - phase 1
+                        if (jointsTracked[rightHandIndex] && jointsTracked[headIndex] && jointsTracked[shoulderCenterIndex] &&
+                            jointsPos[rightHandIndex].y > jointsPos[headIndex].y &&  // Right hand is above the head
+                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[headIndex].x) < 0.2f &&  // Hand is aligned with the head horizontally
+                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[headIndex].z) < 0.2f)  // Hand is aligned with the head depth-wise
+                        {
+                            SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
+                            gestureData.progress = 0.1f;
+                        }
+                        break;
+
+                    case 1:  // gesture phase 2 = complete
+                        if ((timestamp - gestureData.timestamp) <= 1.5f)  // Adjust time limit based on desired duration
+                        {
+                            bool isInPose = jointsTracked[rightHandIndex] && jointsTracked[headIndex] && jointsTracked[shoulderCenterIndex] &&
+                                            jointsPos[rightHandIndex].y > jointsPos[headIndex].y &&  // Right hand is still above the head
+                                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[headIndex].x) < 0.2f &&  // Hand is still aligned with the head horizontally
+                                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[headIndex].z) < 0.2f;  // Hand is still aligned with the head depth-wise
+
+                            if (isInPose)
+                            {
+                                Vector3 jointPos = jointsPos[gestureData.joint];
+                                CheckPoseComplete(ref gestureData, timestamp, jointPos, isInPose, 0f);
+                            }
+                            else
+                            {
+                                // Update progress based on hand movement
+                                float gestureSize = 0.2f;  // Adjust based on desired amplitude of movement
+                                float movement = Mathf.Abs(jointsPos[rightHandIndex].y - gestureData.jointPos.y);
+                                gestureData.progress = movement / gestureSize;
+                            }
+                        }
+                        else
+                        {
+                            // Cancel the gesture if time limit is exceeded
+                            SetGestureCancelled(ref gestureData);
+                        }
+                        break;
+                }
+                break;
+
+            // check for WriteInAir
+            // 好像要满 5s 才做了动作，有点太久了
+            case Gestures.WriteInAir:
+                switch (gestureData.state)
+                {
+                    case 0:  // gesture detection - phase 1
+                        if (jointsTracked[rightHandIndex])
+                        {
+                            SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
+                            gestureData.progress = 0.1f;
+                        }
+                        break;
+
+                    case 1:  // gesture phase 2 = tracking
+                        if ((timestamp - gestureData.timestamp) <= 5.0f)  // Adjust time limit based on desired duration of writing
+                        {
+                            bool isInMotion = jointsTracked[rightHandIndex] &&
+                                              Vector3.Distance(jointsPos[rightHandIndex], gestureData.jointPos) > 0.05f;  // Adjust threshold based on desired sensitivity
+
+                            if (isInMotion)
+                            {
+                                gestureData.jointPos = jointsPos[rightHandIndex];  // Update the position for the next frame
+                                gestureData.progress = Mathf.Min(gestureData.progress + 0.1f, 1.0f);  // Increment progress
+                            }
+                        }
+                        else
+                        {
+                            // Complete the gesture if time limit is reached
+                            if (gestureData.progress >= 1.0f)
+                            {
+                                Vector3 jointPos = jointsPos[gestureData.joint];
+                                CheckPoseComplete(ref gestureData, timestamp, jointPos, true, 0f);
+                            }
+                            else
+                            {
+                                // Cancel the gesture if not enough movement
+                                SetGestureCancelled(ref gestureData);
+                            }
+                        }
+                        break;
+                }
+                break;
+
+
+
                 // here come more gesture-cases
+
+
         }
     }
 
