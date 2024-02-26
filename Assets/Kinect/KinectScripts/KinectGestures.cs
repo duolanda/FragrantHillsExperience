@@ -137,6 +137,9 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
         MoveLeft,          // suggested by Indra Adi D. C
         MoveRight,
 
+        StrikeWoodenFish, // add for fragranthills
+        PlayPiano,
+
         UserGesture1 = 101,
 		UserGesture2 = 102,
 		UserGesture3 = 103,
@@ -1772,6 +1775,97 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         else
                         {
                             // cancel the gesture
+                            SetGestureCancelled(ref gestureData);
+                        }
+                        break;
+                }
+                break;
+
+            // check for StrikeWoodenFish
+            case Gestures.StrikeWoodenFish:
+                switch (gestureData.state)
+                {
+                    case 0:  // gesture detection - phase 1
+                        if (jointsTracked[rightHandIndex] && jointsTracked[leftHandIndex] &&
+                            jointsPos[rightHandIndex].y > jointsPos[leftHandIndex].y &&  // Right hand is above left hand
+                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[leftHandIndex].x) < 0.2f &&  // Hands are aligned horizontally
+                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[leftHandIndex].z) < 0.2f)  // Hands are aligned depth-wise
+                        {
+                            SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
+                            gestureData.progress = 0.1f;
+                        }
+                        break;
+
+                    case 1:  // gesture phase 2 = complete
+                        if ((timestamp - gestureData.timestamp) <= 2.0f)  // Adjust time limit based on desired rhythm
+                        {
+                            bool isInPose = jointsTracked[rightHandIndex] && jointsTracked[leftHandIndex] &&
+                                            jointsPos[rightHandIndex].y > jointsPos[leftHandIndex].y &&  // Right hand is still above left hand
+                                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[leftHandIndex].x) < 0.2f &&  // Hands are still aligned horizontally
+                                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[leftHandIndex].z) < 0.2f;  // Hands are still aligned depth-wise
+
+                            if (isInPose)
+                            {
+                                Vector3 jointPos = jointsPos[gestureData.joint];
+                                CheckPoseComplete(ref gestureData, timestamp, jointPos, isInPose, 0f);
+                            }
+                            else
+                            {
+                                // Update progress based on hand movement
+                                float gestureSize = 0.2f;  // Adjust based on desired amplitude of movement
+                                float movement = Mathf.Abs(jointsPos[rightHandIndex].y - gestureData.jointPos.y);
+                                gestureData.progress = movement / gestureSize;
+                            }
+                        }
+                        else
+                        {
+                            // Cancel the gesture if time limit is exceeded
+                            SetGestureCancelled(ref gestureData);
+                        }
+                        break;
+                }
+                break;
+
+            // check for PlayPiano
+            case Gestures.PlayPiano:
+                switch (gestureData.state)
+                {
+                    case 0:  // gesture detection - phase 1
+                        if (jointsTracked[leftHandIndex] && jointsTracked[rightHandIndex] &&
+                            Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[rightHandIndex].y) < 0.1f &&  // Hands are at the same height
+                            Mathf.Abs(jointsPos[leftHandIndex].x - jointsPos[rightHandIndex].x) > 0.3f &&  // Hands are a certain distance apart
+                            Mathf.Abs(jointsPos[leftHandIndex].z - jointsPos[rightHandIndex].z) < 0.2f)  // Hands are aligned depth-wise
+                        {
+                            SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
+                            gestureData.progress = 0.1f;
+                        }
+                        break;
+
+                    case 1:  // gesture phase 2 = complete
+                        if ((timestamp - gestureData.timestamp) <= 2.0f)  // Adjust time limit based on desired rhythm
+                        {
+                            bool isInPose = jointsTracked[leftHandIndex] && jointsTracked[rightHandIndex] &&
+                                            Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[rightHandIndex].y) < 0.1f &&  // Hands are still at the same height
+                                            Mathf.Abs(jointsPos[leftHandIndex].x - jointsPos[rightHandIndex].x) > 0.3f &&  // Hands are still a certain distance apart
+                                            Mathf.Abs(jointsPos[leftHandIndex].z - jointsPos[rightHandIndex].z) < 0.2f;  // Hands are still aligned depth-wise
+
+                            if (isInPose)
+                            {
+                                Vector3 jointPos = jointsPos[gestureData.joint];
+                                CheckPoseComplete(ref gestureData, timestamp, jointPos, isInPose, 0f);
+                            }
+                            else
+                            {
+                                // Update progress based on hand movement
+                                float gestureSize = 0.2f;  // Adjust based on desired amplitude of movement
+                                float movement = Mathf.Max(Mathf.Abs(jointsPos[leftHandIndex].y - gestureData.jointPos.y),
+                                                           Mathf.Abs(jointsPos[rightHandIndex].y - gestureData.jointPos.y));
+                                gestureData.progress = movement / gestureSize;
+                            }
+                        }
+                        else
+                        {
+                            // Cancel the gesture if time limit is exceeded
                             SetGestureCancelled(ref gestureData);
                         }
                         break;

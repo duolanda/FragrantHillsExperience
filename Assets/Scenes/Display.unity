@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028377, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2807,9 +2807,9 @@ MonoBehaviour:
   leftHandInteraction: 1
   rightHandInteraction: 1
   guiHandCursor: {fileID: 1836123969}
-  gripHandTexture: {fileID: 21300000, guid: 475d892be250472448901e2ac7e4f3da, type: 3}
-  releaseHandTexture: {fileID: 21300000, guid: deab68507f779a144b807ddc9587f2fe, type: 3}
-  normalHandTexture: {fileID: 21300000, guid: 55b9da46e4eef3f4cafab36e66796aeb, type: 3}
+  gripHandTexture: {fileID: 21300000, guid: 0ba176258ea08134a84518bf0a28cec9, type: 3}
+  releaseHandTexture: {fileID: 21300000, guid: dcbdf275e9e2ee04cbfed38127658394, type: 3}
+  normalHandTexture: {fileID: 21300000, guid: f878e1b1b0e1dfa49a41af0de0cca6d7, type: 3}
   handOverlayCursor: 0
   smoothFactor: 10
   allowHandClicks: 1
@@ -3730,7 +3730,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 55b9da46e4eef3f4cafab36e66796aeb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f878e1b1b0e1dfa49a41af0de0cca6d7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
