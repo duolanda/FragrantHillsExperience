@@ -206,14 +206,15 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
 
     // Add by fei
     protected int headIndex;
+    protected int SpineMidIndex;
 
 
-	/// <summary>
-	/// Gets the list of gesture joint indexes.
-	/// </summary>
-	/// <returns>The needed joint indexes.</returns>
-	/// <param name="manager">The KinectManager instance</param>
-	public virtual int[] GetNeededJointIndexes(KinectManager manager)
+    /// <summary>
+    /// Gets the list of gesture joint indexes.
+    /// </summary>
+    /// <returns>The needed joint indexes.</returns>
+    /// <param name="manager">The KinectManager instance</param>
+    public virtual int[] GetNeededJointIndexes(KinectManager manager)
 	{
 //		if (manager == null)
 //			return new int[0];
@@ -243,11 +244,12 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
 		rightAnkleIndex = (int)KinectInterop.JointType.AnkleRight;
 
         headIndex = (int)KinectInterop.JointType.Head;
+        SpineMidIndex = (int)KinectInterop.JointType.SpineMid;
 
 
         int[] neededJointIndexes = {
 			leftHandIndex, rightHandIndex, leftFingerIndex, rightFingerIndex, leftElbowIndex, rightElbowIndex, leftShoulderIndex, rightShoulderIndex,
-			hipCenterIndex, shoulderCenterIndex, leftHipIndex, rightHipIndex, leftKneeIndex, rightKneeIndex, leftAnkleIndex, rightAnkleIndex, headIndex
+			hipCenterIndex, shoulderCenterIndex, leftHipIndex, rightHipIndex, leftKneeIndex, rightKneeIndex, leftAnkleIndex, rightAnkleIndex, headIndex, SpineMidIndex
         };
 
 		return neededJointIndexes;
@@ -1838,13 +1840,15 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
             // check for PlayPiano
             // 有问题，什么都不干也会弹钢琴
             case Gestures.PlayPiano:
+                float handHeightTolerance = 0.2f; // 允许的手部高度偏差
                 switch (gestureData.state)
                 {
                     case 0:  // gesture detection - phase 1
-                        if (jointsTracked[leftHandIndex] && jointsTracked[rightHandIndex] &&
-                            Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[rightHandIndex].y) < 0.1f &&  // Hands are at the same height
-                            Mathf.Abs(jointsPos[leftHandIndex].x - jointsPos[rightHandIndex].x) > 0.3f &&  // Hands are a certain distance apart
-                            Mathf.Abs(jointsPos[leftHandIndex].z - jointsPos[rightHandIndex].z) < 0.2f)  // Hands are aligned depth-wise
+                        if (jointsTracked[leftHandIndex] && jointsTracked[rightHandIndex] && jointsTracked[SpineMidIndex] &&
+                            Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[SpineMidIndex].y) < handHeightTolerance && // 双手高于上身中间
+                            Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[rightHandIndex].y) < 0.1f &&  // 双手高度相近
+                            Mathf.Abs(jointsPos[leftHandIndex].x - jointsPos[rightHandIndex].x) > 0.3f &&  // 双手保持有一定水平距离
+                            Mathf.Abs(jointsPos[leftHandIndex].z - jointsPos[rightHandIndex].z) < 0.2f)  // 双手深度上相近
                         {
                             SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
                             gestureData.progress = 0.1f;
@@ -1852,12 +1856,13 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         break;
 
                     case 1:  // gesture phase 2 = complete
-                        if ((timestamp - gestureData.timestamp) <= 2.0f)  // Adjust time limit based on desired rhythm
+                        if ((timestamp - gestureData.timestamp) <= 3.0f)  // 维持3s
                         {
-                            bool isInPose = jointsTracked[leftHandIndex] && jointsTracked[rightHandIndex] &&
-                                            Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[rightHandIndex].y) < 0.1f &&  // Hands are still at the same height
-                                            Mathf.Abs(jointsPos[leftHandIndex].x - jointsPos[rightHandIndex].x) > 0.3f &&  // Hands are still a certain distance apart
-                                            Mathf.Abs(jointsPos[leftHandIndex].z - jointsPos[rightHandIndex].z) < 0.2f;  // Hands are still aligned depth-wise
+                            bool isInPose = jointsTracked[leftHandIndex] && jointsTracked[rightHandIndex] && jointsTracked[SpineMidIndex] &&
+                                Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[SpineMidIndex].y) < handHeightTolerance &&
+                                Mathf.Abs(jointsPos[leftHandIndex].y - jointsPos[rightHandIndex].y) < 0.1f &&  // 双手高度相近
+                                Mathf.Abs(jointsPos[leftHandIndex].x - jointsPos[rightHandIndex].x) > 0.3f &&  // 双手保持有一定水平距离
+                                Mathf.Abs(jointsPos[leftHandIndex].z - jointsPos[rightHandIndex].z) < 0.2f;  // 双手深度上相近
 
                             if (isInPose)
                             {
@@ -1883,15 +1888,14 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 break;
 
             // check for Salute
-            // 应该略低于头部，现在好像是和头部一样高才行
             case Gestures.Salute:
                 switch (gestureData.state)
                 {
                     case 0:  // gesture detection - phase 1
                         if (jointsTracked[rightHandIndex] && jointsTracked[headIndex] && jointsTracked[shoulderCenterIndex] &&
-                            jointsPos[rightHandIndex].y > jointsPos[headIndex].y &&  // Right hand is above the head
-                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[headIndex].x) < 0.2f &&  // Hand is aligned with the head horizontally
-                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[headIndex].z) < 0.2f)  // Hand is aligned with the head depth-wise
+                            Mathf.Abs(jointsPos[rightHandIndex].y - jointsPos[headIndex].y) <0.15f &&  // 右手和头高差小于15cm
+                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[headIndex].x) < 0.2f &&  // 手和头水平位置相近
+                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[headIndex].z) < 0.2f)  // 手和头深度对齐
                         {
                             SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
                             gestureData.progress = 0.1f;
@@ -1929,7 +1933,6 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 break;
 
             // check for WriteInAir
-            // 要满 5s 才算做了动作，有点太久了
             case Gestures.WriteInAir:
                 switch (gestureData.state)
                 {
@@ -1942,7 +1945,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         break;
 
                     case 1:  // gesture phase 2 = tracking
-                        if ((timestamp - gestureData.timestamp) <= 5.0f)  // Adjust time limit based on desired duration of writing
+                        if ((timestamp - gestureData.timestamp) <= 3.0f)  // 维持4s
                         {
                             bool isInMotion = jointsTracked[rightHandIndex] &&
                                               Vector3.Distance(jointsPos[rightHandIndex], gestureData.jointPos) > 0.05f;  // Adjust threshold based on desired sensitivity
