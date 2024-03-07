@@ -53,14 +53,58 @@ public class MyGestureListener : MonoBehaviour, KinectGestures.GestureListenerIn
 		return false;
 	}
 
-	
+    public bool IsPlayPiano()
+    {
+        if (playPiano)
+        {
+            playPiano = false;
+            return true;
+        }
 
-	/// <summary>
-	/// Invoked when a new user is detected. Here you can start gesture tracking by invoking KinectManager.DetectGesture()-function.
-	/// </summary>
-	/// <param name="userId">User ID</param>
-	/// <param name="userIndex">User index</param>
-	public void UserDetected(long userId, int userIndex)
+        return false;
+    }
+
+    public bool IsSalute()
+    {
+        if (salute)
+        {
+            salute = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsWriteInAirh()
+    {
+        if (writeInAir)
+        {
+            writeInAir = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsPickRedLeaf()
+    {
+        if (pickRedLeaf)
+        {
+            pickRedLeaf = false;
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+    /// <summary>
+    /// Invoked when a new user is detected. Here you can start gesture tracking by invoking KinectManager.DetectGesture()-function.
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <param name="userIndex">User index</param>
+    public void UserDetected(long userId, int userIndex)
 	{
 		// the gestures are allowed for the primary user only
 		KinectManager manager = KinectManager.Instance;

@@ -28,10 +28,10 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
 
     private List<GameObject> scenicSpots = new List<GameObject>();
     private GameObject activeScenicSpot;
+    private List<GameObject> bodyPanels = new List<GameObject>();
+
 
     private InteractionManager interactionManager;
-    private MapGestureListener gestureListener;
-    private ScenicSpotsManager scenicSpotsManager;
 
     private GraphicRaycaster raycaster;
     private EventSystem eventSystem;
@@ -40,6 +40,9 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     private Vector3 screenNormalPos = Vector3.zero;
     private bool isWaitingClose = false;
     private List<GameObject> selectedScenicSpots = new List<GameObject>(); //存储已选择的景点
+
+    private string checkGestureName = "";
+    private MyGestureListener gestureListener;
 
     void Awake()
     {
@@ -62,20 +65,47 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
             }
         }
 
+        //添加五个 panel
+        Transform infoPanelset = canvas.transform.Find("InfoPanelSet");
+        Transform[] panelChildren = infoPanelset.GetComponentsInChildren<Transform>(true);
+        foreach (Transform child in panelChildren)
+        {
+            if (child != infoPanelset.transform) // 确保不包括父对象本身
+            {
+                bodyPanels.Add(child.gameObject);
+            }
+        }
+
         //获取 interactionManager 实例
         if (interactionManager == null)
         {
             interactionManager = GetInteractionManager();
         }
 
-        scenicSpotsManager = ScenicSpotsManager.Instance;
-        //gestureListener = MapGestureListener.Instance;
+        gestureListener = MyGestureListener.Instance;
 
-    }
+}
 
     void Update()
     {
         HandleHoverDisplay();
+        if (checkGestureName != "")
+        {
+            bool is_gesture = CheckGesture(checkGestureName);
+            if (is_gesture && checkGestureName == "salute")
+            {
+                foreach (GameObject panel in bodyPanels)
+                {
+                    if (panel.name == "SQBSPanel")
+                    {
+                        TextMeshProUGUI SQBSText = panel.GetComponentInChildren<TextMeshProUGUI>();
+                        SQBSText.text = "干的漂亮！";
+                        StartCoroutine(WaitBeforeNextClose(panel, SQBSText));
+                    }
+                }
+
+            }
+        }
     }
 
     private InteractionManager GetInteractionManager()
@@ -97,13 +127,47 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         return null;
     }
 
-    private void HandleInfoPanel()
+    private void HandleBodyPanel()
     {
         foreach (GameObject scenicSpot in scenicSpots)
         {
             if (IsCursorNearObject(scenicSpot))
             {
-                CreatePanelAt(scenicSpot.transform.position, scenicSpot.name);
+                string targetPanelName;
+                switch (scenicSpot.name)
+                {
+                    case "香炉峰":
+                        targetPanelName = "XLFPanel";
+                        checkGestureName = "pick";
+                        break;
+                    case "香雾窟":
+                        targetPanelName = "XWKPanel";
+                        checkGestureName = "write";
+                        break;
+                    case "双清别墅":
+                        targetPanelName = "SQBSPanel";
+                        checkGestureName = "salute";
+                        break;
+                    case "碧云寺":
+                        targetPanelName = "BYSPanel";
+                        checkGestureName = "wooden_fish";
+                        break;
+                    case "香山慈幼院":
+                        targetPanelName = "CYYPanel";
+                        checkGestureName = "piano";
+                        break;
+                    default:
+                        targetPanelName = "";
+                        break;
+                }
+              
+                foreach(GameObject panel in bodyPanels)
+                {
+                    if(panel.name == targetPanelName)
+                    {
+                        panel.SetActive(true);
+                    }
+                }
                 break;
             }
         }
@@ -184,11 +248,11 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         //ScenicNameText.text = scenicSpotName;
     }
 
-    IEnumerator WaitBeforeNextClose()
+    IEnumerator WaitBeforeNextClose(GameObject panel, TextMeshProUGUI SQBSText)
     {
-        isWaitingClose = true; 
-        yield return new WaitForSeconds(2f); // 等待2秒
-        isWaitingClose = false; 
+        yield return new WaitForSeconds(3f); // 等待3秒
+        panel.SetActive(false);
+        SQBSText.text = "请做出敬礼的动作！";
     }
 
 
@@ -210,7 +274,7 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         //isLeftHandDrag = !isRightHand;
         screenNormalPos = handScreenPos;
 
-        HandleInfoPanel();
+        HandleBodyPanel();
     }
 
     public void HandReleaseDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
@@ -230,5 +294,21 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         return true;
     }
 
-
+    public bool CheckGesture(string gesture_name)
+    {
+        switch (gesture_name)
+        {
+            case "piano":
+                return gestureListener.IsPlayPiano();
+            case "pick":
+                return gestureListener.IsPickRedLeaf();
+            case "salute":
+                return gestureListener.IsSalute();
+            case "wooden_fish":
+                return gestureListener.IsStrikeWoodenFish();
+            case "write":
+                return gestureListener.IsWriteInAirh();
+        }
+        return false;
+    }
 }

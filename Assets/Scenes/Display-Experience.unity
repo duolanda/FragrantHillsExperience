@@ -1617,7 +1617,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1204053608}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -1821,7 +1821,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1298221668
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1899,7 +1899,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1311138992
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2049,6 +2049,7 @@ GameObject:
   - component: {fileID: 1363732018}
   - component: {fileID: 1363732021}
   - component: {fileID: 1363732022}
+  - component: {fileID: 1363732023}
   m_Layer: 0
   m_Name: KinectController
   m_TagString: Untagged
@@ -2192,6 +2193,20 @@ MonoBehaviour:
   leftHandInteraction: 1
   rightHandInteraction: 1
   canvas: {fileID: 1288977489}
+--- !u!114 &1363732023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363732016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d33e4555814a9740b5c25ac4fef5f37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerIndex: 0
+  gestureInfo: {fileID: 558005082}
 --- !u!1 &1427641982
 GameObject:
   m_ObjectHideFlags: 0
@@ -2502,7 +2517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1518921867
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3051,7 +3066,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1850506534
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3333,7 +3348,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2092279398
 RectTransform:
   m_ObjectHideFlags: 0
