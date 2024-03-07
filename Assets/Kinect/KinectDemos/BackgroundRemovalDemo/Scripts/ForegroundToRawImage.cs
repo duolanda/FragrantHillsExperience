@@ -8,10 +8,11 @@ public class ForegroundToRawImage : MonoBehaviour
 	private RawImage rawImage;
 
 
-	void Start()
+    void Start()
 	{
 		rawImage = GetComponent<RawImage>();
-	}
+
+    }
 
 
 	void Update () 

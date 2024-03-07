@@ -30,8 +30,8 @@ public class FireManager : MonoBehaviour
         float height = 2f * cam.orthographicSize;
         float width = height * cam.aspect;
 
-        Debug.Log("height:" + height);
-        Debug.Log("width:" + width);
+        //Debug.Log("height:" + height);
+        //Debug.Log("width:" + width);
 
         width = width / 1.5f; //只在中间区域生成，除的数越小，生成区域越大
 
