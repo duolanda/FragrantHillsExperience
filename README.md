@@ -8,34 +8,33 @@ A Unity program that people can enjoy when they visit the Fragrant Hills（香�
 ## Todo
 
 - [x] A Fragrant Hills map for test
-
 - [x] Algorithm for path finder
-
 - [ ] Drawing path on the road (Hard!)
-
 - [x] Communication between phone and computer
-
   - [ ] Only the latest device can send message
 
 - [x] AR drawing
-
   - [x] Use correct shader to set color
-
   - [x] Can't see line immediately, need pull back the phone
-
   - [x] Restart button not work
-
   - [x] Replace reticle image with ARKit official coaching guide 
-
   - [x] AR Line synchronization✌🏻
-
   - [ ] Calibration the Line on different device
 
-- [ ] Interaction based on Kinect
+- [x] Interaction based on Kinect
   - [x] Cursor to choose scenic spots
-  - [ ] Scene changing gesture
-  - [ ] Support multi-user check scenic spots synchronously
-  - [ ] Fire extinguishing multi-player game
+  - [x] Select scenic spots and draw path
+  - [ ] Body Experience Scene
+  - [ ] Support multi-user select scenic spots synchronously
+  - [x] Fire extinguishing multi-player game
+  - [ ] User silhouette show
+
+- [ ] UI
+  - [ ] Main Menu for choose three scenes
+  - [ ] Path Draw Scene UI
+  - [ ] Body Experience Scene UI
+  - [ ] FIre extinguishing game UI
+
 
 
 
