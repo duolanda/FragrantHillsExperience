@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -28,11 +28,14 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     [Tooltip("Canvas for this scene")]
     public Canvas canvas;
 
+    public GameObject selectionIndicatorPrefab;
+
     private List<GameObject> scenicSpots = new List<GameObject>();
     private GameObject activeScenicSpot;
 
     private InteractionManager interactionManager;
     private MapGestureListener gestureListener;
+    private ScenicSpotsManager scenicSpotsManager;
 
     private GraphicRaycaster raycaster;
     private EventSystem eventSystem;
@@ -40,6 +43,8 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
     private bool isWaitingClose = false;
+    private List<GameObject> selectedScenicSpots = new List<GameObject>(); //å­˜å‚¨å·²é€‰æ‹©çš„æ™¯ç‚¹
+    private Dictionary<GameObject, GameObject> selectionIndicators = new Dictionary<GameObject, GameObject>(); // å­˜å‚¨æ™¯ç‚¹å’Œå…¶å¯¹åº”çš„é€‰ä¸­æŒ‡ç¤ºå™¨
 
     void Awake()
     {
@@ -49,24 +54,26 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     void Start()
     {
+        // æ·»åŠ æ™¯ç‚¹ gameobject
         var scenicSpotsParent = GameObject.Find("Map/ScenicSpots");
         if (scenicSpotsParent != null){
             Transform[] scenicSpotsChildren = scenicSpotsParent.GetComponentsInChildren<Transform>(true);
             foreach (Transform child in scenicSpotsChildren)
             {
-                if (child != scenicSpotsParent.transform) // È·±£²»°üÀ¨¸¸¶ÔÏó±¾Éí
+                if (child != scenicSpotsParent.transform) // ç¡®ä¿ä¸åŒ…æ‹¬çˆ¶å¯¹è±¡æœ¬èº«
                 {
                     scenicSpots.Add(child.gameObject);
                 }
             }
         }
 
-        //»ñÈ¡ interactionManager ÊµÀı
+        //è·å– interactionManager å®ä¾‹
         if (interactionManager == null)
         {
             interactionManager = GetInteractionManager();
         }
 
+        scenicSpotsManager = ScenicSpotsManager.Instance;
         //gestureListener = MapGestureListener.Instance;
 
     }
@@ -133,7 +140,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     private void HandlePanelClose()
     {
-        //¼ì²â°´ÏÂ¶¯×÷£¬×¢Òâ£¬Ä¿Ç°Ö»¼ì²âÓÒÊÖ
+        //æ£€æµ‹æŒ‰ä¸‹åŠ¨ä½œï¼Œæ³¨æ„ï¼Œç›®å‰åªæ£€æµ‹å³æ‰‹
         if (!interactionManager.IsRightHandPress() || isWaitingClose)
         {
             return;
@@ -147,15 +154,15 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
         foreach (RaycastResult result in results)
         {
-            // ¼ì²âµ½µÄUIÔªËØ
+            // æ£€æµ‹åˆ°çš„UIå…ƒç´ 
             GameObject hitObject = result.gameObject;
 
-            // Í¨¹ı±êÇ©¼ì²éÊÇ·ñÊÇÃæ°å
+            // é€šè¿‡æ ‡ç­¾æ£€æŸ¥æ˜¯å¦æ˜¯é¢æ¿
             if (hitObject.CompareTag("InfoPanel"))
             {
                 //hitObject.SetActive(false);
                 Destroy(hitObject);
-                StartCoroutine(WaitBeforeNextClose()); // µÈ2sÔÙ¹ØÏÂÒ»¸ö£¬±ÜÃâÁ¬Ğø¹Ø±Õ
+                StartCoroutine(WaitBeforeNextClose()); // ç­‰2så†å…³ä¸‹ä¸€ä¸ªï¼Œé¿å…è¿ç»­å…³é—­
                 break;
             }
         }
@@ -173,7 +180,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private Vector3 GetCursorPosition()
     {
 
-        // Ä¬ÈÏ»ñÈ¡ÓÒÊÖÎ»ÖÃ:
+        // é»˜è®¤è·å–å³æ‰‹ä½ç½®:
         Vector3 screenNormalPos = interactionManager.GetRightHandScreenPos();
         Vector3 screenPixelPos = new Vector3(
             screenNormalPos.x * (screenCamera ? screenCamera.pixelWidth : Screen.width),
@@ -186,7 +193,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     private void ShowHoverAt(Vector3 position)
     {
-        // GUI ÔªËØĞèÒªÊ¹ÓÃÆÁÄ»×ø±ê
+        // GUI å…ƒç´ éœ€è¦ä½¿ç”¨å±å¹•åæ ‡
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
 
         hoverDisplay.SetActive(true);
@@ -201,13 +208,13 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     private void CreatePanelAt(Vector3 position, string scenicSpotName)
     {
-        //´´½¨Ãæ°å
+        //åˆ›å»ºé¢æ¿
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
         GameObject infoPanel = Instantiate(infoPanelPrefab, screenPosition, Quaternion.identity);
         Transform infoPanelset = canvas.transform.Find("InfoPanelSet");
-        infoPanel.transform.SetParent(infoPanelset, true); //´´½¨ÔÚÌØ¶¨Îï¼şÏÂÒÔ±£Ö¤ÏÔÊ¾²ã¼¶
+        infoPanel.transform.SetParent(infoPanelset, true); //åˆ›å»ºåœ¨ç‰¹å®šç‰©ä»¶ä¸‹ä»¥ä¿è¯æ˜¾ç¤ºå±‚çº§
 
-        //ĞŞ¸Ä¾°µãÃû³Æ
+        //ä¿®æ”¹æ™¯ç‚¹åç§°
         Transform ScenicNameTransform = infoPanel.transform.Find("ScenicNameText");
         TextMeshProUGUI ScenicNameText = ScenicNameTransform.GetComponent<TextMeshProUGUI>();
         ScenicNameText.text = scenicSpotName;
@@ -216,18 +223,99 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     IEnumerator WaitBeforeNextClose()
     {
         isWaitingClose = true; 
-        yield return new WaitForSeconds(2f); // µÈ´ı2Ãë
+        yield return new WaitForSeconds(2f); // ç­‰å¾…2ç§’
         isWaitingClose = false; 
     }
+
+
+    private void ToggleScenicSpotSelection()
+    {
+        foreach (GameObject scenicSpot in scenicSpots)
+        {
+            if (IsCursorNearObject(scenicSpot))
+            {
+                if (selectedScenicSpots.Contains(scenicSpot))
+                {
+                    selectedScenicSpots.Remove(scenicSpot);
+                    DeselectAScenicSpot(scenicSpot);
+                }
+                else
+                {
+                    selectedScenicSpots.Add(scenicSpot);
+                    SelectAScenicSpot(scenicSpot);
+                }
+                break;
+            }
+        }
+    }
+
+    //é€‰æ‹©äº†æŸä¸ªæ™¯ç‚¹
+    private void SelectAScenicSpot(GameObject scenicSpot)
+    {
+        Vector3 screenPosition = screenCamera.WorldToScreenPoint(scenicSpot.transform.position);
+        GameObject indicator = Instantiate(selectionIndicatorPrefab, screenPosition, Quaternion.identity, canvas.transform);
+        selectionIndicators[scenicSpot] = indicator; // å­˜å‚¨æŒ‡ç¤ºå™¨å¼•ç”¨
+    }
+
+    //å–æ¶ˆé€‰æ‹©æŸä¸ªæ™¯ç‚¹
+    private void DeselectAScenicSpot(GameObject scenicSpot)
+    {
+        if (selectionIndicators.ContainsKey(scenicSpot))
+        {
+            Destroy(selectionIndicators[scenicSpot]);
+            selectionIndicators.Remove(scenicSpot);
+        }
+    }
+
+    private void DrawPath()
+    {
+        HashSet<string> selectedSpotNames = new HashSet<string>(); 
+        foreach (GameObject scenicSpot in selectedScenicSpots)
+        {
+            selectedSpotNames.Add(scenicSpot.name);
+        }
+        scenicSpotsManager.DrawPathByName(selectedSpotNames);
+    }
+
+    private void HandleButton()
+    {
+        PointerEventData pointerEventData = new PointerEventData(eventSystem);
+        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
+        List<RaycastResult> results = new List<RaycastResult>();
+        raycaster.Raycast(pointerEventData, results);
+
+
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject.CompareTag("Button"))
+            {
+                switch (result.gameObject.name)
+                {
+                    case "DrawPathButton":
+                        DrawPath();
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
+
 
     public void HandGripDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
     {
         if (!isHandInteracting || !interactionManager)
             return;
-        Debug.Log("userID£º" + userId);
-        Debug.Log("interactionManager.GetUserID()£º" + interactionManager.GetUserID());
-        Debug.Log("userIndex£º" + userIndex);
-        Debug.Log("·Ö¸îÏß");
+        //Debug.Log("userIDï¼š" + userId);
+        //Debug.Log("interactionManager.GetUserID()ï¼š" + interactionManager.GetUserID());
+        //Debug.Log("userIndexï¼š" + userIndex);
+        //Debug.Log("åˆ†å‰²çº¿");
+
         //if (userId != interactionManager.GetUserID())
         //    return;
        
@@ -236,7 +324,9 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         //isLeftHandDrag = !isRightHand;
         screenNormalPos = handScreenPos;
 
-        HandleInfoPanel();
+        ToggleScenicSpotSelection();
+        //HandleInfoPanel();
+        HandleButton();
     }
 
     public void HandReleaseDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
@@ -255,4 +345,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     {
         return true;
     }
+
+
 }

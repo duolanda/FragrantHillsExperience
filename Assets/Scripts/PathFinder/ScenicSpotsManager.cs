@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-public class ScenicSpotsManager : MonoBehaviour {
+public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
     public List<ScenicSpot> scenicSpots;
     public Dictionary<int, ScenicSpot> spotsDictionary;
     public PathDrawer pathDrawer;
@@ -22,6 +22,22 @@ public class ScenicSpotsManager : MonoBehaviour {
         //{
         //    Debug.Log(spot.name);
         //}
+    }
+
+    public void DrawPathByName(HashSet<string> spotNames)
+    {
+        List<int> selectedSpotIDs = new List<int>();
+        foreach (string name in spotNames)
+        {
+            ScenicSpot spot = scenicSpots.FirstOrDefault(s => s.name == name);
+            if (spot != null)
+            {
+                selectedSpotIDs.Add(spot.id);
+            }
+        }
+
+        List<ScenicSpot> path = FindPathCoveringAllSpots(selectedSpotIDs);
+        pathDrawer.DrawPath(path);
     }
     
     void ImportScenicSpots() {
