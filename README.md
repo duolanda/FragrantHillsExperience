@@ -24,8 +24,9 @@ A Unity program that people can enjoy when they visit the Fragrant Hills（香�
 - [x] Interaction based on Kinect
   - [x] Cursor to choose scenic spots
   - [x] Select scenic spots and draw path
-  - [ ] Body Experience Scene
   - [ ] Support multi-user select scenic spots synchronously
+  - [x] Body Experience Scene
+  - [ ] Multi-user use Body Experience
   - [x] Fire extinguishing multi-player game
   - [ ] User silhouette show
 

@@ -38,11 +38,26 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
 
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
-    private bool isWaitingClose = false;
-    private List<GameObject> selectedScenicSpots = new List<GameObject>(); //存储已选择的景点
 
     private string checkGestureName = "";
+    private string checkSpotName = "";
     private MyGestureListener gestureListener;
+    private Dictionary<string, ScenicSpotInfo> scenicSpotInfos;
+
+
+    public struct ScenicSpotInfo
+    {
+        public string panelName;
+        public string gestureName;
+        public string instructionText;
+
+        public ScenicSpotInfo(string panelName, string gestureName, string instructionText)
+        {
+            this.panelName = panelName;
+            this.gestureName = gestureName;
+            this.instructionText = instructionText;
+        }
+    }
 
     void Awake()
     {
@@ -70,11 +85,21 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         Transform[] panelChildren = infoPanelset.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in panelChildren)
         {
-            if (child != infoPanelset.transform) // 确保不包括父对象本身
+            if (child.CompareTag("BodyPanel")) //只添加特定标签的 panel，避免添加 panel 的 children，如 text
             {
                 bodyPanels.Add(child.gameObject);
             }
         }
+
+        //初始化字典
+        scenicSpotInfos = new Dictionary<string, ScenicSpotInfo>
+        {
+            { "香炉峰", new ScenicSpotInfo("XLFPanel", "pick", "请做出摘红叶的动作！") },
+            { "香雾窟", new ScenicSpotInfo("XWKPanel", "write", "请做出题字的动作！") },
+            { "双清别墅", new ScenicSpotInfo("SQBSPanel", "salute", "请做出敬礼的动作！") },
+            { "碧云寺", new ScenicSpotInfo("BYSPanel", "wooden_fish", "请做出敲木鱼的动作！") },
+            { "香山慈幼院", new ScenicSpotInfo("CYYPanel", "piano", "请做出弹琴的动作！") }
+        };
 
         //获取 interactionManager 实例
         if (interactionManager == null)
@@ -89,21 +114,18 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     void Update()
     {
         HandleHoverDisplay();
-        if (checkGestureName != "")
-        {
-            bool is_gesture = CheckGesture(checkGestureName);
-            if (is_gesture && checkGestureName == "salute")
-            {
-                foreach (GameObject panel in bodyPanels)
-                {
-                    if (panel.name == "SQBSPanel")
-                    {
-                        TextMeshProUGUI SQBSText = panel.GetComponentInChildren<TextMeshProUGUI>();
-                        SQBSText.text = "干的漂亮！";
-                        StartCoroutine(WaitBeforeNextClose(panel, SQBSText));
-                    }
-                }
 
+        if (checkGestureName != "" && CheckGesture(checkGestureName) && scenicSpotInfos.TryGetValue(checkSpotName, out ScenicSpotInfo info))
+        {
+            foreach (GameObject panel in bodyPanels)
+            {
+                if (panel.name == info.panelName)
+                {
+                    TextMeshProUGUI textComponent = panel.GetComponentInChildren<TextMeshProUGUI>();
+                    textComponent.text = "干得漂亮！";
+                    StartCoroutine(WaitClose(panel, textComponent, info.instructionText));
+                    break;
+                }
             }
         }
     }
@@ -129,43 +151,18 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
 
     private void HandleBodyPanel()
     {
-        foreach (GameObject scenicSpot in scenicSpots)
+        foreach (GameObject scenicSpot in scenicSpots )
         {
-            if (IsCursorNearObject(scenicSpot))
+            if (IsCursorNearObject(scenicSpot) && scenicSpotInfos.TryGetValue(scenicSpot.name, out ScenicSpotInfo info))
             {
-                string targetPanelName;
-                switch (scenicSpot.name)
-                {
-                    case "香炉峰":
-                        targetPanelName = "XLFPanel";
-                        checkGestureName = "pick";
-                        break;
-                    case "香雾窟":
-                        targetPanelName = "XWKPanel";
-                        checkGestureName = "write";
-                        break;
-                    case "双清别墅":
-                        targetPanelName = "SQBSPanel";
-                        checkGestureName = "salute";
-                        break;
-                    case "碧云寺":
-                        targetPanelName = "BYSPanel";
-                        checkGestureName = "wooden_fish";
-                        break;
-                    case "香山慈幼院":
-                        targetPanelName = "CYYPanel";
-                        checkGestureName = "piano";
-                        break;
-                    default:
-                        targetPanelName = "";
-                        break;
-                }
-              
                 foreach(GameObject panel in bodyPanels)
                 {
-                    if(panel.name == targetPanelName)
+                    if(panel.name == info.panelName)
                     {
                         panel.SetActive(true);
+                        checkSpotName = scenicSpot.name;
+                        checkGestureName = info.gestureName;
+                        break;
                     }
                 }
                 break;
@@ -234,25 +231,11 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     }
 
 
-    private void CreatePanelAt(Vector3 position, string scenicSpotName)
-    {
-        ////创建面板
-        //Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
-        //GameObject infoPanel = Instantiate(infoPanelPrefab, screenPosition, Quaternion.identity);
-        //Transform infoPanelset = canvas.transform.Find("InfoPanelSet");
-        //infoPanel.transform.SetParent(infoPanelset, true); //创建在特定物件下以保证显示层级
-
-        ////修改景点名称
-        //Transform ScenicNameTransform = infoPanel.transform.Find("ScenicNameText");
-        //TextMeshProUGUI ScenicNameText = ScenicNameTransform.GetComponent<TextMeshProUGUI>();
-        //ScenicNameText.text = scenicSpotName;
-    }
-
-    IEnumerator WaitBeforeNextClose(GameObject panel, TextMeshProUGUI SQBSText)
+    IEnumerator WaitClose(GameObject panel, TextMeshProUGUI textComponent, string instructionText)
     {
         yield return new WaitForSeconds(3f); // 等待3秒
         panel.SetActive(false);
-        SQBSText.text = "请做出敬礼的动作！";
+        textComponent.text = instructionText;
     }
 
 
