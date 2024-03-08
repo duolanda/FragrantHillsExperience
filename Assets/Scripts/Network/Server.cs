@@ -22,6 +22,8 @@ public class Server : MonoBehaviour
     private Dictionary<int, ScenicSpot> spotsDictionary;
     private List<int> globalIDs = new List<int>();
 
+    private ScenicSpotSelectionManager scenicSpotSelectionManager;
+
 
     private void Start()
     {
@@ -31,14 +33,15 @@ public class Server : MonoBehaviour
         // ScenicSpot[] spotsArray = JsonHelper.FromJson<ScenicSpot>(jsonText);
         // List<ScenicSpot> scenicSpots = new List<ScenicSpot>(spotsArray);
         // spotsDictionary = scenicSpots.ToDictionary(spot => spot.id, spot => spot);
+        scenicSpotSelectionManager = ScenicSpotSelectionManager.Instance;
     }
 
     void Update()
     {
-        while (messageQueue.TryDequeue(out string message))
-        {
-            statusText.text += "\n" + message;
-        }
+        //while (messageQueue.TryDequeue(out string message))
+        //{
+        //    statusText.text += "\n" + message;
+        //}
     }
     
     public void StartServer()
@@ -53,6 +56,15 @@ public class Server : MonoBehaviour
         acceptThread.Start();
         
         UpdateStatusText("Server started...");
+    }
+
+    public void UpdateGlobalIDs(List<int> newIDs)
+    {
+        lock (globalIDs)
+        {
+            globalIDs = newIDs;
+        }
+        BroadcastIDs();
     }
 
     private void AcceptClients()
@@ -108,6 +120,7 @@ public class Server : MonoBehaviour
                                 {
                                     globalIDs = numbers;
                                 }
+                                scenicSpotSelectionManager.UpdateSelectedScenicSpotIDList(globalIDs); //更新单例
                                 BroadcastIDs();
                                 break;
                         }

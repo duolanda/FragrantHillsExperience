@@ -9,13 +9,9 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
     public Dictionary<int, ScenicSpot> spotsDictionary;
     public PathDrawer pathDrawer;
 
-    void Start() {
+    void Awake() {
         ImportScenicSpots();
-        
-        List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,44,35,32,28,21,4,3});
-        // List<ScenicSpot> result = FindPathCoveringAllSpots(new List<int>(){45,20,14,9,51});
-        
-        //pathDrawer.DrawPath(result);
+        Debug.Log("Json 导入完毕");        
 
         //输出导入的景点
         //foreach (ScenicSpot spot in result)

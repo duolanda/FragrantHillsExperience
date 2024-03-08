@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -45,6 +46,16 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private Vector3 screenNormalPos = Vector3.zero;
     private bool isWaitingClose = false;
 
+    void OnEnable()
+    {
+        ScenicSpotSelectionManager.SpotUpdateEvent += UpdateSelectSpotShow;
+    }
+
+    void OnDisble()
+    {
+        ScenicSpotSelectionManager.SpotUpdateEvent -= UpdateSelectSpotShow;
+    }
+
     void Awake()
     {
         raycaster = canvas.GetComponent<GraphicRaycaster>();
@@ -53,19 +64,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     void Start()
     {
-        // 添加景点 gameobject
-        var scenicSpotsParent = GameObject.Find("Map/ScenicSpots");
-        if (scenicSpotsParent != null){
-            Transform[] scenicSpotsChildren = scenicSpotsParent.GetComponentsInChildren<Transform>(true);
-            foreach (Transform child in scenicSpotsChildren)
-            {
-                if (child != scenicSpotsParent.transform) // 确保不包括父对象本身
-                {
-                    scenicSpots.Add(child.gameObject);
-                }
-            }
-        }
-
         //获取 interactionManager 实例
         if (interactionManager == null)
         {
@@ -75,6 +73,20 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         scenicSpotsManager = ScenicSpotsManager.Instance;
         scenicSpotSelectionManager = ScenicSpotSelectionManager.Instance;
         //gestureListener = MapGestureListener.Instance;
+
+        // 添加景点 gameobject
+        var scenicSpotsParent = GameObject.Find("Map/ScenicSpots");
+        if (scenicSpotsParent != null)
+        {
+            Transform[] scenicSpotsChildren = scenicSpotsParent.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in scenicSpotsChildren)
+            {
+                if (child != scenicSpotsParent.transform) // 确保不包括父对象本身
+                {
+                    scenicSpots.Add(child.gameObject);
+                }
+            }
+        }
 
     }
 
@@ -310,7 +322,16 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         }
     }
 
-
+    private void UpdateSelectSpotShow()
+    {
+        // 更新选择的景点的画面
+        List<GameObject> selectedScenicSpots = scenicSpotSelectionManager.SelectedScenicSpots;
+        ResetSelectAndPath();
+        foreach(GameObject scenicSpot in selectedScenicSpots)
+        {
+            SelectAScenicSpot(scenicSpot);
+        }
+    }
 
     public void HandGripDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
     {
