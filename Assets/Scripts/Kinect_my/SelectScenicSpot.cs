@@ -36,6 +36,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private InteractionManager interactionManager;
     private MapGestureListener gestureListener;
     private ScenicSpotsManager scenicSpotsManager;
+    private ScenicSpotSelectionManager scenicSpotSelectionManager;
 
     private GraphicRaycaster raycaster;
     private EventSystem eventSystem;
@@ -43,8 +44,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
     private bool isWaitingClose = false;
-    private List<GameObject> selectedScenicSpots = new List<GameObject>(); //存储已选择的景点
-    private Dictionary<GameObject, GameObject> selectionIndicators = new Dictionary<GameObject, GameObject>(); // 存储景点和其对应的选中指示器
 
     void Awake()
     {
@@ -74,6 +73,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         }
 
         scenicSpotsManager = ScenicSpotsManager.Instance;
+        scenicSpotSelectionManager = ScenicSpotSelectionManager.Instance;
         //gestureListener = MapGestureListener.Instance;
 
     }
@@ -232,16 +232,15 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     {
         foreach (GameObject scenicSpot in scenicSpots)
         {
-            if (IsCursorNearObject(scenicSpot))
+            if (IsCursorNearObject(scenicSpot))    
             {
+                List<GameObject> selectedScenicSpots = scenicSpotSelectionManager.SelectedScenicSpots;
                 if (selectedScenicSpots.Contains(scenicSpot))
                 {
-                    selectedScenicSpots.Remove(scenicSpot);
                     DeselectAScenicSpot(scenicSpot);
                 }
                 else
                 {
-                    selectedScenicSpots.Add(scenicSpot);
                     SelectAScenicSpot(scenicSpot);
                 }
                 break;
@@ -254,21 +253,18 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     {
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(scenicSpot.transform.position);
         GameObject indicator = Instantiate(selectionIndicatorPrefab, screenPosition, Quaternion.identity, canvas.transform);
-        selectionIndicators[scenicSpot] = indicator; // 存储指示器引用
+        scenicSpotSelectionManager.AddSelectedScenicSpot(scenicSpot, indicator); // 存储指示器
     }
 
     //取消选择某个景点
     private void DeselectAScenicSpot(GameObject scenicSpot)
     {
-        if (selectionIndicators.ContainsKey(scenicSpot))
-        {
-            Destroy(selectionIndicators[scenicSpot]);
-            selectionIndicators.Remove(scenicSpot);
-        }
+        scenicSpotSelectionManager.RemoveSelectedScenicSpot(scenicSpot);
     }
 
     private void DrawPath()
     {
+        List<GameObject> selectedScenicSpots = scenicSpotSelectionManager.SelectedScenicSpots;
         HashSet<string> selectedSpotNames = new HashSet<string>(); 
         foreach (GameObject scenicSpot in selectedScenicSpots)
         {
