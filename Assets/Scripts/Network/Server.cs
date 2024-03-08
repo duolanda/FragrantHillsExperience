@@ -120,7 +120,10 @@ public class Server : MonoBehaviour
                                 {
                                     globalIDs = numbers;
                                 }
-                                scenicSpotSelectionManager.UpdateSelectedScenicSpotIDList(globalIDs); //更新单例
+                                MainThreadDispatcher.ExecuteOnMainThread(()=> {
+                                    // 因为后续涉及到 UI 操作，必须在主线程执行
+                                    scenicSpotSelectionManager.UpdateSelectedScenicSpotIDList(globalIDs); //更新单例
+                                });
                                 BroadcastIDs();
                                 break;
                         }

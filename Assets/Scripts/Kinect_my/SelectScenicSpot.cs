@@ -325,7 +325,9 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private void UpdateSelectSpotShow()
     {
         // 更新选择的景点的画面
-        List<GameObject> selectedScenicSpots = scenicSpotSelectionManager.SelectedScenicSpots;
+        List<GameObject> selectedScenicSpots = new List<GameObject>();
+        scenicSpotSelectionManager.SelectedScenicSpots.ForEach(i => selectedScenicSpots.Add(i)); //深拷贝才行
+
         ResetSelectAndPath();
         foreach(GameObject scenicSpot in selectedScenicSpots)
         {

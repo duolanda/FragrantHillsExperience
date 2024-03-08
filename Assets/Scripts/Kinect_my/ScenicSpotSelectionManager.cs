@@ -102,7 +102,7 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
 
         foreach (GameObject spot in SelectedScenicSpots)
         {
-            int id = id2SpotsObject.FirstOrDefault(s => s.Value.name == name).Key;
+            int id = id2SpotsObject.FirstOrDefault(s => s.Value.name == spot.name).Key;
             SelectedScenicSpotIDs.Add(id);
         }
         return SelectedScenicSpotIDs;
