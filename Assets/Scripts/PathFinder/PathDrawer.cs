@@ -21,6 +21,11 @@ public class PathDrawer : MonoBehaviour {
         Vector3[] points = path.Select(spot => spot.position).ToArray();
         lineRenderer.SetPositions(points);
     }
+
+    public void ClearPath()
+    {
+        lineRenderer.positionCount = 0;
+    }
     
 }
 

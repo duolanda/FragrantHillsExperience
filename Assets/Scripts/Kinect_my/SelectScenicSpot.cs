@@ -273,6 +273,12 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         scenicSpotsManager.DrawPathByName(selectedSpotNames);
     }
 
+    private void ResetSelectAndPath()
+    {
+        scenicSpotsManager.ClearDraw();
+        scenicSpotSelectionManager.RemoveAllSelectedScenicSpot();
+    }
+
     private void HandleButton()
     {
         PointerEventData pointerEventData = new PointerEventData(eventSystem);
@@ -289,6 +295,9 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                 {
                     case "DrawPathButton":
                         DrawPath();
+                        break;
+                    case "ResetButton":
+                        ResetSelectAndPath();
                         break;
                     default:
                         return;

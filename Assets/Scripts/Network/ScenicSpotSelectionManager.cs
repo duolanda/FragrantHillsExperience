@@ -1,13 +1,13 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
 {
-    // ´æ´¢ÒÑÑ¡ÔñµÄ¾°µã
+    // å­˜å‚¨å·²é€‰æ‹©çš„æ™¯ç‚¹
     public List<GameObject> SelectedScenicSpots { get; private set; } = new List<GameObject>();
 
-    // ´æ´¢¾°µãºÍÆä¶ÔÓ¦µÄÑ¡ÖÐÖ¸Ê¾Æ÷
+    // å­˜å‚¨æ™¯ç‚¹å’Œå…¶å¯¹åº”çš„é€‰ä¸­æŒ‡ç¤ºå™¨
     public Dictionary<GameObject, GameObject> SelectionIndicators { get; private set; } = new Dictionary<GameObject, GameObject>();
 
     public void AddSelectedScenicSpot(GameObject scenicSpot, GameObject indicator)
@@ -23,6 +23,20 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
         {
             Destroy(SelectionIndicators[scenicSpot]);
             SelectionIndicators.Remove(scenicSpot);
+        }
+    }
+
+    public void RemoveAllSelectedScenicSpot()
+    {
+        for (int i = SelectedScenicSpots.Count - 1; i >= 0; i--)
+        {
+            var scenicSpot = SelectedScenicSpots[i];
+            if (SelectionIndicators.ContainsKey(scenicSpot))
+            {
+                Destroy(SelectionIndicators[scenicSpot]);
+                SelectionIndicators.Remove(scenicSpot);
+            }
+            SelectedScenicSpots.RemoveAt(i);
         }
     }
 }

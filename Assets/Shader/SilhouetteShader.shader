@@ -1,4 +1,4 @@
-Shader "Unlit/SilhouetteShader"
+﻿Shader "Unlit/SilhouetteShader"
 {
 	Properties
 	{

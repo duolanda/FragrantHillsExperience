@@ -40,6 +40,11 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         pathDrawer.DrawPath(path);
     }
     
+    public void ClearDraw()
+    {
+        pathDrawer.ClearPath();
+    }
+
     void ImportScenicSpots() {
         string json = File.ReadAllText(Application.dataPath + "/Json/ScenicSpots.json");
         ScenicSpot[] spotsArray = JsonHelper.FromJson<ScenicSpot>(json);

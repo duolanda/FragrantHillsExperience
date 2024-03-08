@@ -28,7 +28,7 @@ A Unity program that people can enjoy when they visit the Fragrant Hills（香�
   - [x] Body Experience Scene
   - [ ] Multi-user use Body Experience
   - [x] Fire extinguishing multi-player game
-  - [ ] User silhouette show
+  - [x] User silhouette show
 
 - [ ] UI
   - [ ] Main Menu for choose three scenes
