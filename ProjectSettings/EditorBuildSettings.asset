@@ -5,15 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/ARCollaborationData/ARCollaborationDataExample.unity
-    guid: 900e7bfe6122645fba71b90941afb9c5
-  - enabled: 0
-    path: Assets/Scenes/Draw.unity
-    guid: 637834fa0aae845aa809437f1b4f56b0
-  - enabled: 0
-    path: Assets/Scenes/Communication.unity
-    guid: e8d0d73a0c58d44568022fd5cbbeec28
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 40ad26c0feaa7914cac1e950d8277290
+  - enabled: 1
+    path: Assets/Scenes/Display-Experience.unity
+    guid: a63032d129187e44bacf6ce8794bea8d
+  - enabled: 1
+    path: Assets/Scenes/Display.unity
+    guid: 54466bc8cca03429fb046b13915ec7bf
+  - enabled: 1
+    path: Assets/Scenes/Display-Fire.unity
+    guid: ad49e86bc57a551429f8a07db8585399
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: ee8d582ce8e1e4e82aae9346ded91ffc, type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: ac23f3052b9ad4dd6892fb76882afe48, type: 2}

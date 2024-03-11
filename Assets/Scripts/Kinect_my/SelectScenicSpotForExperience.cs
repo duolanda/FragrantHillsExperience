@@ -44,6 +44,8 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     private MyGestureListener gestureListener;
     private Dictionary<string, ScenicSpotInfo> scenicSpotInfos;
 
+    private bool isPanelActive = false;
+
 
     public struct ScenicSpotInfo
     {
@@ -151,6 +153,8 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
 
     private void HandleBodyPanel()
     {
+        if (isPanelActive) return; // 如果已经有激活的面板，不处理光标事件
+
         foreach (GameObject scenicSpot in scenicSpots )
         {
             if (IsCursorNearObject(scenicSpot) && scenicSpotInfos.TryGetValue(scenicSpot.name, out ScenicSpotInfo info))
@@ -160,6 +164,8 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                     if(panel.name == info.panelName)
                     {
                         panel.SetActive(true);
+                        isPanelActive = true;
+                        interactionManager.guiHandCursor.gameObject.SetActive(false);
                         checkSpotName = scenicSpot.name;
                         checkGestureName = info.gestureName;
                         break;
@@ -235,6 +241,8 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     {
         yield return new WaitForSeconds(3f); // 等待3秒
         panel.SetActive(false);
+        isPanelActive = false;
+        interactionManager.guiHandCursor.gameObject.SetActive(true);
         textComponent.text = instructionText;
     }
 
