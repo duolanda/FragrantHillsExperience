@@ -285,10 +285,10 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         scenicSpotsManager.DrawPathByName(selectedSpotNames);
     }
 
-    private void ResetSelectAndPath()
+    private void ResetSelectAndPath(bool updateRemote = true)
     {
         scenicSpotsManager.ClearDraw();
-        scenicSpotSelectionManager.RemoveAllSelectedScenicSpot();
+        scenicSpotSelectionManager.RemoveAllSelectedScenicSpot(updateRemote);
     }
 
     private void HandleButton()
@@ -328,7 +328,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         List<GameObject> selectedScenicSpots = new List<GameObject>();
         scenicSpotSelectionManager.SelectedScenicSpots.ForEach(i => selectedScenicSpots.Add(i)); //深拷贝才行
 
-        ResetSelectAndPath();
+        ResetSelectAndPath(false);
         foreach(GameObject scenicSpot in selectedScenicSpots)
         {
             SelectAScenicSpot(scenicSpot);

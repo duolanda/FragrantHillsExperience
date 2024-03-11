@@ -165,11 +165,16 @@ public class Server : MonoBehaviour
     
     private void BroadcastIDs()
     {
+        List<TcpClient> clientsCopy;
         lock (clients)
-        {
-            foreach (TcpClient client in clients)
             {
-                if (client.Connected)
+            clientsCopy = new List<TcpClient>(clients);
+            }
+        foreach (TcpClient client in clientsCopy)
+        {
+            if (client.Connected)
+            {
+                try
                 {
                     using (NetworkStream stream = client.GetStream())
                     {
@@ -184,8 +189,14 @@ public class Server : MonoBehaviour
                         }
                     }
                 }
+                catch(Exception e)
+                {
+                    Debug.Log($"Boardcast error:{e.Message}");
+                }
+                
             }
         }
+        
         UpdateStatusText($"Broadcasted numbers: {string.Join(", ", globalIDs)}");
     }
 }

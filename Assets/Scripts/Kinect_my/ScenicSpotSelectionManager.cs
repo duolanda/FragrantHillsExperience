@@ -39,7 +39,7 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
                 if (child != scenicSpotsParent.transform)
                 {
                     //建立景点 object 和 id 对应
-                    name = child.gameObject.name;
+                    string name = child.gameObject.name;
                     int id = scenicSpotsManager.spotsDictionary.FirstOrDefault(s => s.Value.name == name).Key;
                     id2SpotsObject[id] = child.gameObject;
                 }
@@ -67,7 +67,7 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
         ServerControl.UpdateGlobalIDs(GenerateIDs());
     }
 
-    public void RemoveAllSelectedScenicSpot()
+    public void RemoveAllSelectedScenicSpot(bool updateRemote=true)
     {
         for (int i = SelectedScenicSpots.Count - 1; i >= 0; i--)
         {
@@ -79,8 +79,10 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
             }
             SelectedScenicSpots.RemoveAt(i);
         }
-
-        ServerControl.UpdateGlobalIDs(GenerateIDs());
+        if (updateRemote)
+        {
+            ServerControl.UpdateGlobalIDs(GenerateIDs());
+        }
     }
 
     public void UpdateSelectedScenicSpotIDList(List<int> idList)
