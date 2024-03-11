@@ -12,6 +12,7 @@ public class Server2 : MonoBehaviour
     [SerializeField] private int port = 7777;
     private List<Socket> clients = new List<Socket>();
     private bool isRunning = false;
+    private Socket listener;
     private List<int> globalIDs = new List<int>();
 
     private ScenicSpotSelectionManager scenicSpotSelectionManager;
@@ -29,7 +30,7 @@ public class Server2 : MonoBehaviour
         IPAddress ipAddress = IPAddress.Any;
         IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
 
-        Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         listener.Bind(localEndPoint);
         listener.Listen(10);
 
@@ -41,6 +42,7 @@ public class Server2 : MonoBehaviour
                 lock (clients)
                 {
                     clients.Add(client);
+                    Debug.Log($"Client connected: {client.RemoteEndPoint.ToString()}");
                 }
                 Thread clientThread = new Thread(() => HandleClient(client));
                 clientThread.Start();
@@ -128,5 +130,6 @@ public class Server2 : MonoBehaviour
                 client.Close();
             }
         }
+        listener.Close();
     }
 }

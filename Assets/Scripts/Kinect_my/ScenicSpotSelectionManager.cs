@@ -47,12 +47,15 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
         }
     }
 
-    public void AddSelectedScenicSpot(GameObject scenicSpot, GameObject indicator)
+    public void AddSelectedScenicSpot(GameObject scenicSpot, GameObject indicator, bool updateRemote = true)
     {
         SelectedScenicSpots.Add(scenicSpot);
         SelectionIndicators[scenicSpot] = indicator;
 
-        ServerControl.UpdateGlobalIDs(GenerateIDs());
+        if (updateRemote)
+        {
+            ServerControl.UpdateGlobalIDs(GenerateIDs());
+        }
     }
 
     public void RemoveSelectedScenicSpot(GameObject scenicSpot)

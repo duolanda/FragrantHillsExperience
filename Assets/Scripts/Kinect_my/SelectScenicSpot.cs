@@ -261,11 +261,11 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     }
 
     //选择了某个景点
-    private void SelectAScenicSpot(GameObject scenicSpot)
+    private void SelectAScenicSpot(GameObject scenicSpot, bool updateRemote = true)
     {
         Vector3 screenPosition = screenCamera.WorldToScreenPoint(scenicSpot.transform.position);
         GameObject indicator = Instantiate(selectionIndicatorPrefab, screenPosition, Quaternion.identity, canvas.transform);
-        scenicSpotSelectionManager.AddSelectedScenicSpot(scenicSpot, indicator); // 存储指示器
+        scenicSpotSelectionManager.AddSelectedScenicSpot(scenicSpot, indicator, updateRemote); // 存储指示器
     }
 
     //取消选择某个景点
@@ -331,7 +331,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         ResetSelectAndPath(false);
         foreach(GameObject scenicSpot in selectedScenicSpots)
         {
-            SelectAScenicSpot(scenicSpot);
+            SelectAScenicSpot(scenicSpot, false);
         }
     }
 
