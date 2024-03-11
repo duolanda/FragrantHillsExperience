@@ -16,7 +16,7 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
 
     public GameObject scenicSpotsParent;
 
-    private Server ServerControl;
+    private Server2 ServerControl;
 
     void Start()
     {
@@ -24,7 +24,7 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
         GameObject NetworkManager = GameObject.Find("NetworkManager");
         if (NetworkManager != null)
         {
-            ServerControl = NetworkManager.GetComponent<Server>();
+            ServerControl = NetworkManager.GetComponent<Server2>();
         }
         ServerControl.StartServer();
 

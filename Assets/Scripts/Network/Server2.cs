@@ -14,9 +14,11 @@ public class Server2 : MonoBehaviour
     private bool isRunning = false;
     private List<int> globalIDs = new List<int>();
 
+    private ScenicSpotSelectionManager scenicSpotSelectionManager;
+
     private void Start()
     {
-        StartServer();
+        scenicSpotSelectionManager = ScenicSpotSelectionManager.Instance;
     }
 
     public void StartServer()
@@ -49,6 +51,15 @@ public class Server2 : MonoBehaviour
         Debug.Log("Server started...");
     }
 
+    public void UpdateGlobalIDs(List<int> newIDs)
+    {
+        lock (globalIDs)
+        {
+            globalIDs = newIDs;
+        }
+        BroadcastIDs();
+    }
+
     private void HandleClient(Socket client)
     {
         try
@@ -79,9 +90,15 @@ public class Server2 : MonoBehaviour
     private void ReceiveData(string data)
     {
         data = data.Replace("<EOF>", "");
-        Debug.Log($"Received: {data}");
 
-        globalIDs = data.Split(',').Select(int.Parse).ToList();
+        lock (globalIDs)
+        {
+            globalIDs = data.Split(',').Select(int.Parse).ToList();
+        }
+
+        MainThreadDispatcher.ExecuteOnMainThread(() => {
+            scenicSpotSelectionManager.UpdateSelectedScenicSpotIDList(globalIDs);
+        });
         BroadcastIDs();
     }
 

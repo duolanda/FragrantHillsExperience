@@ -4914,11 +4914,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1990939705}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae2ce8945865b4e78ab56b2b9a67d911, type: 3}
+  m_Script: {fileID: 11500000, guid: fa08123019e3e4c43bb9a86be784b6a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   port: 7777
-  statusText: {fileID: 0}
 --- !u!1 &2011782819
 GameObject:
   m_ObjectHideFlags: 0
