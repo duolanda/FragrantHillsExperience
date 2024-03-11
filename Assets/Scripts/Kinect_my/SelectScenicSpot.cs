@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
@@ -311,6 +312,9 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                     case "ResetButton":
                         ResetSelectAndPath();
                         break;
+                    case "MainMenuButton":
+                        ReturnToMainMenu();
+                        break;
                     default:
                         return;
                 }
@@ -320,6 +324,11 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                 return;
             }
         }
+    }
+
+    private void ReturnToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 
     private void UpdateSelectSpotShow()

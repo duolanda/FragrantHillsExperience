@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerInterface
@@ -246,7 +247,37 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         textComponent.text = instructionText;
     }
 
+    private void HandleButton()
+    {
+        PointerEventData pointerEventData = new PointerEventData(eventSystem);
+        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
+        List<RaycastResult> results = new List<RaycastResult>();
+        raycaster.Raycast(pointerEventData, results);
 
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject.CompareTag("Button"))
+            {
+                switch (result.gameObject.name)
+                {
+                    case "MainMenuButton":
+                        ReturnToMainMenu();
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
+    private void ReturnToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 
     public void HandGripDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
     {
@@ -266,6 +297,7 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         screenNormalPos = handScreenPos;
 
         HandleBodyPanel();
+        HandleButton();
     }
 
     public void HandReleaseDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
