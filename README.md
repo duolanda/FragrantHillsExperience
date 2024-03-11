@@ -31,7 +31,7 @@ A Unity program that people can enjoy when they visit the Fragrant Hills（香�
   - [x] User silhouette show
 
 - [ ] UI
-  - [ ] Main Menu for choose three scenes
+  - [x] Main Menu for choose three scenes
   - [ ] Path Draw Scene UI
   - [ ] Body Experience Scene UI
   - [ ] FIre extinguishing game UI
