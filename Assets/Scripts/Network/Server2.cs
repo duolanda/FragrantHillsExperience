@@ -44,6 +44,7 @@ public class Server2 : MonoBehaviour
                     clients.Add(client);
                     Debug.Log($"Client connected: {client.RemoteEndPoint.ToString()}");
                 }
+                BroadcastIDsToClient(client); //给新加入的客户端同步
                 Thread clientThread = new Thread(() => HandleClient(client));
                 clientThread.Start();
             }
@@ -118,6 +119,17 @@ public class Server2 : MonoBehaviour
             }
         }
         Debug.Log($"Broadcasted IDs: {string.Join(", ", globalIDs)}");
+    }
+
+    private void BroadcastIDsToClient(Socket client)
+    {
+        if (client.Connected)
+        {
+            byte[] msg = Encoding.ASCII.GetBytes(string.Join(",", globalIDs) + "<EOF>");
+            client.Send(msg);
+            Debug.Log($"Broadcasted IDs to new client: {string.Join(", ", globalIDs)}");
+        }
+        
     }
 
     private void OnApplicationQuit()
