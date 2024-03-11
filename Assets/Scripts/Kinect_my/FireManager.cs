@@ -14,12 +14,23 @@ public class FireManager : MonoBehaviour
     private Vector2 fireSize;
     private int extinguishedCount = 0; // 扑灭的火焰数量
 
+    private SelectScenicSpotForFire panelControl;
+
+    public bool gameStarted = false;
 
 
     void Start()
     {
+        GameObject KinectController = GameObject.Find("KinectController");
+        if (KinectController != null)
+        {
+            panelControl = KinectController.GetComponent<SelectScenicSpotForFire>();
+        }
+    }
 
-        fireSize = firePrefab.GetComponent<SpriteRenderer>().bounds.size; 
+    public void StartFire()
+    {
+        fireSize = firePrefab.GetComponent<SpriteRenderer>().bounds.size;
         StartCoroutine(SpawnFires());
     }
 
@@ -47,10 +58,23 @@ public class FireManager : MonoBehaviour
         GameObject fire = Instantiate(firePrefab, spawnPosition, Quaternion.identity, transform);
         fire.GetComponent<FireTrigger>().OnExtinguished += () => extinguishedCount++; // 订阅事件
     }
-    
+
+    public void DestroyAllFires()
+    {
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
 
     IEnumerator SpawnFires()
     {
+        if (!gameStarted)
+        {
+            yield break; // 如果游戏尚未开始，则退出协程
+        }
+
         float timer = duration;
 
         while (timer > 0)
@@ -63,5 +87,8 @@ public class FireManager : MonoBehaviour
         }
 
         textCountDownSecond.text = "0";
+
+        DestroyAllFires();
+        panelControl.GameOver(extinguishedCount);
     }
 }
