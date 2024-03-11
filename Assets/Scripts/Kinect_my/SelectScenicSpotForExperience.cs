@@ -110,8 +110,10 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
             interactionManager = GetInteractionManager();
         }
 
-        gestureListener = MyGestureListener.Instance;
-
+        if (gestureListener == null)
+        {
+            gestureListener = GetGestureListener();
+        }
 }
 
     void Update()
@@ -127,6 +129,9 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                     TextMeshProUGUI textComponent = panel.GetComponentInChildren<TextMeshProUGUI>();
                     textComponent.text = "干得漂亮！";
                     StartCoroutine(WaitClose(panel, textComponent, info.instructionText));
+
+                    MyForegroundToRawImage rb = panel.GetComponentInChildren<MyForegroundToRawImage>();
+                    rb.playerIndex = playerIndex;
                     break;
                 }
             }
@@ -146,6 +151,25 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                 if (manager.playerIndex == playerIndex && manager.leftHandInteraction == leftHandInteraction && manager.rightHandInteraction == rightHandInteraction)
                 {
                     return manager;
+                }
+            }
+        }
+        return null;
+    }
+
+    private MyGestureListener GetGestureListener()
+    {
+        MonoBehaviour[] monoScripts = FindObjectsOfType(typeof(MonoBehaviour)) as MonoBehaviour[];
+
+        foreach (MonoBehaviour monoScript in monoScripts)
+        {
+            if ((monoScript is MyGestureListener) && monoScript.enabled)
+            {
+                MyGestureListener listener = (MyGestureListener)monoScript;
+
+                if (listener.playerIndex == playerIndex)
+                {
+                    return listener;
                 }
             }
         }

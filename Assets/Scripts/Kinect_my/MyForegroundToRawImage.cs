@@ -7,7 +7,7 @@ public class MyForegroundToRawImage : MonoBehaviour
 {
 	private RawImage rawImage;
     public Color showColor;
-
+    public int playerIndex = 0;
 
     void Start()
 	{
@@ -20,13 +20,16 @@ public class MyForegroundToRawImage : MonoBehaviour
 	{
 		if (rawImage && rawImage.texture == null) 
 		{
-			BackgroundRemovalManager backManager = BackgroundRemovalManager.Instance;
+			MyBackgroundRemovalManager backManager = MyBackgroundRemovalManager.Instance;
 			KinectManager kinectManager = KinectManager.Instance;
 
-			if (kinectManager && backManager && backManager.enabled /**&& backManager.IsBackgroundRemovalInitialized()*/) 
-			{
-				rawImage.texture = backManager.GetForegroundTex();  // user's foreground texture
-				rawImage.rectTransform.localScale = kinectManager.GetColorImageScale();
+			if (kinectManager && backManager && backManager.enabled /**&& backManager.IsBackgroundRemovalInitialized()*/)
+            {
+                Texture playerTexture = backManager.GetPlayerForegroundTex(playerIndex);
+                rawImage.texture = playerTexture;
+
+                //rawImage.texture = backManager.GetForegroundTex();  // user's foreground texture
+                rawImage.rectTransform.localScale = kinectManager.GetColorImageScale();
 				rawImage.color = showColor;
 
 			} 
