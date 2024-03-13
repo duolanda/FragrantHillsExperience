@@ -96,7 +96,14 @@ public class Server2 : MonoBehaviour
 
         lock (globalIDs)
         {
-            globalIDs = data.Split(',').Select(int.Parse).ToList();
+            if (string.IsNullOrEmpty(data))
+            {
+                globalIDs = new List<int>();
+            }
+            else
+            {
+                globalIDs = data.Split(',').Select(int.Parse).ToList();
+            }
         }
 
         MainThreadDispatcher.ExecuteOnMainThread(() => {

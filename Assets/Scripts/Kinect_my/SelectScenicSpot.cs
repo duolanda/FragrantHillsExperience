@@ -333,12 +333,13 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     private void UpdateSelectSpotShow()
     {
-        // 更新选择的景点的画面
+        // 更新选择的景点的画面，加上同步后id的景点
         List<GameObject> selectedScenicSpots = new List<GameObject>();
         scenicSpotSelectionManager.SelectedScenicSpots.ForEach(i => selectedScenicSpots.Add(i)); //深拷贝才行
 
-        ResetSelectAndPath(false);
-        foreach(GameObject scenicSpot in selectedScenicSpots)
+        ResetSelectAndPath(false); //必须再清一遍，不然会重复添加 id
+
+        foreach (GameObject scenicSpot in selectedScenicSpots)
         {
             SelectAScenicSpot(scenicSpot, false);
         }

@@ -90,9 +90,12 @@ public class ScenicSpotSelectionManager : Singleton<ScenicSpotSelectionManager>
 
     public void UpdateSelectedScenicSpotIDList(List<int> idList)
     {
+        //必须在 SelectedScenicSpots clear 前清掉画面，不然 SelectedScenicSpots 同步后就不知道画面上有哪些景点了
+        RemoveAllSelectedScenicSpot(false);
+
         SelectedScenicSpots.Clear();
 
-        foreach(int id in idList)
+        foreach (int id in idList)
         {
             id2SpotsObject.TryGetValue(id, out GameObject scenicSpot);
             SelectedScenicSpots.Add(scenicSpot);
