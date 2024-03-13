@@ -1798,9 +1798,11 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 {
                     case 0:  // gesture detection - phase 1
                         if (jointsTracked[rightHandIndex] && jointsTracked[leftHandIndex] &&
-                            jointsPos[rightHandIndex].y > jointsPos[leftHandIndex].y &&  // Right hand is above left hand
-                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[leftHandIndex].x) < 0.2f &&  // Hands are aligned horizontally
-                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[leftHandIndex].z) < 0.2f)  // Hands are aligned depth-wise
+                            jointsTracked[leftShoulderIndex] && jointsTracked[rightElbowIndex] &&
+                            jointsPos[leftHandIndex].y > jointsPos[rightHandIndex].y &&  // 左手比右手高
+                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[leftHandIndex].x) < 0.3f &&  // Hands are aligned horizontally
+                            jointsPos[leftShoulderIndex].y - jointsPos[leftHandIndex].y > 0.2f && // 左手低于肩膀
+                            jointsPos[rightHandIndex].y - jointsPos[rightElbowIndex].y  < 0.2f)  // 右手低于右肘
                         {
                             SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
                             gestureData.progress = 0.1f;
@@ -1811,9 +1813,11 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         if ((timestamp - gestureData.timestamp) <= 2.0f)  // Adjust time limit based on desired rhythm
                         {
                             bool isInPose = jointsTracked[rightHandIndex] && jointsTracked[leftHandIndex] &&
-                                            jointsPos[rightHandIndex].y > jointsPos[leftHandIndex].y &&  // Right hand is still above left hand
-                                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[leftHandIndex].x) < 0.2f &&  // Hands are still aligned horizontally
-                                            Mathf.Abs(jointsPos[rightHandIndex].z - jointsPos[leftHandIndex].z) < 0.2f;  // Hands are still aligned depth-wise
+                            jointsTracked[leftShoulderIndex] && jointsTracked[rightElbowIndex] &&
+                            jointsPos[leftHandIndex].y > jointsPos[rightHandIndex].y &&  // 左手比右手高
+                            Mathf.Abs(jointsPos[rightHandIndex].x - jointsPos[leftHandIndex].x) < 0.3f &&  // Hands are aligned horizontally
+                            jointsPos[leftShoulderIndex].y - jointsPos[leftHandIndex].y > 0.2f && // 左手低于肩膀
+                            jointsPos[rightHandIndex].y - jointsPos[rightElbowIndex].y < 0.2f; // 右手低于右肘
 
                             if (isInPose)
                             {
@@ -1937,7 +1941,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 switch (gestureData.state)
                 {
                     case 0:  // gesture detection - phase 1
-                        if (jointsTracked[rightHandIndex])
+                        if (jointsTracked[rightHandIndex] && jointsTracked[hipCenterIndex])
                         {
                             SetGestureJoint(ref gestureData, timestamp, rightHandIndex, jointsPos[rightHandIndex]);
                             gestureData.progress = 0.1f;
@@ -1947,7 +1951,8 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                     case 1:  // gesture phase 2 = tracking
                         if ((timestamp - gestureData.timestamp) <= 3.0f)  // 维持4s
                         {
-                            bool isInMotion = jointsTracked[rightHandIndex] &&
+                            bool isInMotion = jointsTracked[rightHandIndex] && jointsTracked[hipCenterIndex]
+                                              && jointsPos[rightHandIndex].y> jointsPos[hipCenterIndex].y &&
                                               Vector3.Distance(jointsPos[rightHandIndex], gestureData.jointPos) > 0.05f;  // Adjust threshold based on desired sensitivity
 
                             if (isInMotion)
