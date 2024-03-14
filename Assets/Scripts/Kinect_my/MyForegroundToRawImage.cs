@@ -20,19 +20,24 @@ public class MyForegroundToRawImage : MonoBehaviour
 	{
 		if (rawImage && rawImage.texture == null) 
 		{
-			MyBackgroundRemovalManager backManager = MyBackgroundRemovalManager.Instance;
-			KinectManager kinectManager = KinectManager.Instance;
+			MyBackgroundRemovalManager myBackManager = MyBackgroundRemovalManager.Instance;
+            BackgroundRemovalManager backManager = BackgroundRemovalManager.Instance;
+            KinectManager kinectManager = KinectManager.Instance;
 
 			if (kinectManager && backManager && backManager.enabled /**&& backManager.IsBackgroundRemovalInitialized()*/)
             {
-                Texture playerTexture = backManager.GetPlayerForegroundTex(playerIndex);
-                rawImage.texture = playerTexture;
-
-                //rawImage.texture = backManager.GetForegroundTex();  // user's foreground texture
+                rawImage.texture = backManager.GetForegroundTex();  // user's foreground texture
                 rawImage.rectTransform.localScale = kinectManager.GetColorImageScale();
 				rawImage.color = showColor;
 
-			} 
+			}
+            else if(kinectManager && myBackManager && myBackManager.enabled)
+            {
+                Texture playerTexture = myBackManager.GetPlayerForegroundTex(playerIndex);
+                rawImage.texture = playerTexture;
+                rawImage.rectTransform.localScale = kinectManager.GetColorImageScale();
+                rawImage.color = showColor;
+            }
 			else if(kinectManager /**&& kinectManager.IsInitialized()*/)
 			{
 				SimpleBackgroundRemoval simpleBR = GameObject.FindObjectOfType<SimpleBackgroundRemoval>();
