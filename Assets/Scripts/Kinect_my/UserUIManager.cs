@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,12 +15,12 @@ public class UserUIManager : MonoBehaviour
 
     void Start()
     {
-        colors[0] = new Color32(217, 112, 99, 255); //ºì
-        colors[1] = new Color32(106, 130, 231, 255); //À¶
-        colors[2] = new Color32(112, 164, 67, 255); //ÂÌ
-        colors[3] = new Color32(238, 237, 90, 255); //»Æ
-        colors[4] = new Color32(220, 154, 66, 255); //³È
-        colors[5] = new Color32(141, 100, 161, 255); //×Ï
+        colors[0] = new Color32(217, 112, 99, 255); //çº¢
+        colors[1] = new Color32(106, 130, 231, 255); //è“
+        colors[2] = new Color32(112, 164, 67, 255); //ç»¿
+        colors[3] = new Color32(238, 237, 90, 255); //é»„
+        colors[4] = new Color32(220, 154, 66, 255); //æ©™
+        colors[5] = new Color32(141, 100, 161, 255); //ç´«
 
 
         GameObject KinectController = GameObject.Find("KinectController");
@@ -37,27 +37,27 @@ public class UserUIManager : MonoBehaviour
 
     private void UserAdd(long userId, int userIndex)
     {
-        userChangeText.text = "¼ì²âµ½ÓÎ¿Í¼ÓÈë";
+        userChangeText.text = "æ£€æµ‹åˆ°æ¸¸å®¢åŠ å…¥";
         userChangeText.color = colors[userIndex];
 
-        userCountText.text = "µ±Ç°²Ù×İÓÎ¿ÍÊı£º" + km.GetUsersCount();
-        StopAllCoroutines(); // Í£Ö¹ËùÓĞĞ­³Ì£¬ÒÔ·ÀÖ®Ç°µÄĞ­³Ì»¹ÔÚÔËĞĞ
-        StartCoroutine(HideUserChangeText()); // Æô¶¯Ğ­³ÌÀ´Òş²ØÎÄ±¾
+        userCountText.text = "å½“å‰æ“çºµæ¸¸å®¢æ•°ï¼š" + km.GetUsersCount();
+        StopAllCoroutines(); // åœæ­¢æ‰€æœ‰åç¨‹ï¼Œä»¥é˜²ä¹‹å‰çš„åç¨‹è¿˜åœ¨è¿è¡Œ
+        StartCoroutine(HideUserChangeText()); // å¯åŠ¨åç¨‹æ¥éšè—æ–‡æœ¬
     }
 
     private void UserRemove(long userId, int userIndex)
     {
-        userChangeText.text = "¼ì²âµ½ÓÎ¿ÍÀë¿ª";
+        userChangeText.text = "æ£€æµ‹åˆ°æ¸¸å®¢ç¦»å¼€";
         userChangeText.color = colors[userIndex];
 
-        userCountText.text = "µ±Ç°²Ù×İÓÎ¿ÍÊı£º" + km.GetUsersCount();
+        userCountText.text = "å½“å‰æ“çºµæ¸¸å®¢æ•°ï¼š" + km.GetUsersCount();
         StopAllCoroutines(); 
         StartCoroutine(HideUserChangeText()); 
     }
 
     IEnumerator HideUserChangeText()
     {
-        yield return new WaitForSeconds(5); // µÈ´ı3Ãë
-        userChangeText.text = ""; // Çå¿ÕÎÄ±¾£¬Òş²ØÎÄ±¾¿ò
+        yield return new WaitForSeconds(5); // ç­‰å¾…5ç§’
+        userChangeText.text = ""; // æ¸…ç©ºæ–‡æœ¬ï¼Œéšè—æ–‡æœ¬æ¡†
     }
 }

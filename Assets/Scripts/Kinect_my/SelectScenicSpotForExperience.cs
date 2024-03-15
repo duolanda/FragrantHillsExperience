@@ -46,6 +46,7 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     private Dictionary<string, ScenicSpotInfo> scenicSpotInfos;
 
     private bool isPanelActive = false;
+    private Coroutine panelAutoCloseCoroutine = null;
 
 
     public struct ScenicSpotInfo
@@ -193,6 +194,12 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                         interactionManager.guiHandCursor.gameObject.SetActive(false);
                         checkSpotName = scenicSpot.name;
                         checkGestureName = info.gestureName;
+
+                        if (panelAutoCloseCoroutine != null)
+                        {
+                            StopCoroutine(panelAutoCloseCoroutine);
+                        }
+                        panelAutoCloseCoroutine = StartCoroutine(AutoClosePanel(panel, info.instructionText)); //超时自动关闭
                         break;
                     }
                 }
@@ -264,6 +271,12 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
 
     IEnumerator WaitClose(GameObject panel, TextMeshProUGUI textComponent, string instructionText)
     {
+        if (panelAutoCloseCoroutine != null)
+        {
+            StopCoroutine(panelAutoCloseCoroutine);
+            panelAutoCloseCoroutine = null; // 清除引用
+        }
+
         yield return new WaitForSeconds(3f); // 等待3秒
         panel.SetActive(false);
         isPanelActive = false;
@@ -357,5 +370,19 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                 return gestureListener.IsWriteInAirh();
         }
         return false;
+    }
+
+    IEnumerator AutoClosePanel(GameObject panel, string instructionText)
+    {
+        yield return new WaitForSeconds(60f); // 等待60秒// 如果面板仍然激活，则关闭它if(panel.activeSelf)
+        {
+            panel.SetActive(false);
+            isPanelActive = false;
+            interactionManager.guiHandCursor.gameObject.SetActive(true);
+            TextMeshProUGUI textComponent = panel.GetComponentInChildren<TextMeshProUGUI>(); if (textComponent != null)
+            {
+                textComponent.text = instructionText;
+            }
+        }
     }
 }

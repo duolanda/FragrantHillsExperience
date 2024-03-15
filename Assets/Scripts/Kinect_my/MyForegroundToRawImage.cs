@@ -8,10 +8,18 @@ public class MyForegroundToRawImage : MonoBehaviour
 	private RawImage rawImage;
     public Color showColor;
     public int playerIndex = 0;
+    private Color32[] colors = new Color32[6];
 
     void Start()
 	{
-		rawImage = GetComponent<RawImage>();
+        colors[0] = new Color32(217, 112, 99, 255); //红
+        colors[1] = new Color32(106, 130, 231, 255); //蓝
+        colors[2] = new Color32(112, 164, 67, 255); //绿
+        colors[3] = new Color32(238, 237, 90, 255); //黄
+        colors[4] = new Color32(220, 154, 66, 255); //橙
+        colors[5] = new Color32(141, 100, 161, 255); //紫
+
+        rawImage = GetComponent<RawImage>();
 
     }
 
@@ -36,7 +44,7 @@ public class MyForegroundToRawImage : MonoBehaviour
                 Texture playerTexture = myBackManager.GetPlayerForegroundTex(playerIndex);
                 rawImage.texture = playerTexture;
                 rawImage.rectTransform.localScale = kinectManager.GetColorImageScale();
-                rawImage.color = showColor;
+                rawImage.color = colors[playerIndex];
             }
 			else if(kinectManager /**&& kinectManager.IsInitialized()*/)
 			{
