@@ -303,7 +303,15 @@ public class MyBackgroundRemovalManager : MonoBehaviour
                     {
                         if (kinectManager && kinectManager.IsInitialized())
                         {
-                            playerForegroundTextures[playerIndex] = sensorData.alphaBodyTexture; //原版并没有用foregroundTex，而是直接返回了这个这个
+                            sensorData.sensorInterface.UpdateSensorData(sensorData);
+                            if (!playerForegroundTextures.ContainsKey(playerIndex))
+                            {
+                                playerForegroundTextures.Add(playerIndex, sensorData.alphaBodyTexture);
+                            }
+                            else
+                            {
+                                playerForegroundTextures[playerIndex] = sensorData.alphaBodyTexture;
+                            }
                         }
                     }
                 }
