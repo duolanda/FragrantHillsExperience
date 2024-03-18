@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18018606, g: 0.22559257, b: 0.30678663, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3387,7 +3387,6 @@ GameObject:
   - component: {fileID: 1363732018}
   - component: {fileID: 1363732022}
   - component: {fileID: 1363732023}
-  - component: {fileID: 1363732024}
   - component: {fileID: 1363732027}
   - component: {fileID: 1363732026}
   - component: {fileID: 1363732025}
@@ -3529,29 +3528,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerIndex: 0
   gestureInfo: {fileID: 558005082}
---- !u!114 &1363732024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1363732016}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a559e12c3f373eb4c8d0e1096fec8a67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerIndex: 0
-  foregroundCamera: {fileID: 0}
-  colorCameraResolution: 1
-  computeBodyTexOnly: 1
-  invertAlphaColorMask: 0
-  erodeIterations0: 0
-  dilateIterations: 0
-  erodeIterations: 0
-  bodyBlurFilter: 1
-  bodyContourColor: {r: 0, g: 0, b: 0, a: 1}
-  debugText: {fileID: 0}
 --- !u!114 &1363732025
 MonoBehaviour:
   m_ObjectHideFlags: 0

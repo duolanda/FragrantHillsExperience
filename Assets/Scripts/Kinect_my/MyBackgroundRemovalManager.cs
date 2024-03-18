@@ -303,10 +303,6 @@ public class MyBackgroundRemovalManager : MonoBehaviour
                     {
                         if (kinectManager && kinectManager.IsInitialized())
                         {
-                            bool bLimitedUsers = kinectManager.IsTrackedUsersLimited();
-                            List<int> alTrackedIndexes = kinectManager.GetTrackedBodyIndices();
-                            bSuccess = sensorData.sensorInterface.PollForegroundFrame(sensorData, colorCameraResolution, defaultColor, bLimitedUsers, alTrackedIndexes, ref foregroundImage); //永远返回 false
-
                             playerForegroundTextures[playerIndex] = sensorData.alphaBodyTexture; //原版并没有用foregroundTex，而是直接返回了这个这个
                         }
                     }
