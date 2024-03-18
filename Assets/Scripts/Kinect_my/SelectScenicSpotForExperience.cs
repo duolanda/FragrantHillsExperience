@@ -195,6 +195,9 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                         checkSpotName = scenicSpot.name;
                         checkGestureName = info.gestureName;
 
+                        MyForegroundToRawImage fg = panel.GetComponentInChildren<MyForegroundToRawImage>();
+                        fg.playerIndex = playerIndex; //设置成对应的 player id
+
                         if (panelAutoCloseCoroutine != null)
                         {
                             StopCoroutine(panelAutoCloseCoroutine);
