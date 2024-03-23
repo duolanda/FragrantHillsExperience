@@ -94,7 +94,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     void Update()
     {
         HandleHoverDisplay();
-        HandlePanelClose();
     }
 
     private InteractionManager GetInteractionManager()
@@ -114,19 +113,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
             }
         }
         return null;
-    }
-
-    private void HandleInfoPanel()
-    {
-        foreach (GameObject scenicSpot in scenicSpots)
-        {
-            if (IsCursorNearObject(scenicSpot))
-            {
-                CreatePanelAt(scenicSpot.transform.position, scenicSpot.name);
-                break;
-            }
-        }
-
     }
 
     private void HandleHoverDisplay()
@@ -151,35 +137,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         }
     }
 
-    private void HandlePanelClose()
-    {
-        //检测按下动作，注意，目前只检测右手
-        if (!interactionManager.IsRightHandPress() || isWaitingClose)
-        {
-            return;
-        }
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        PointerEventData pointerEventData = new PointerEventData(eventSystem);
-
-        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
-        raycaster.Raycast(pointerEventData, results);
-
-        foreach (RaycastResult result in results)
-        {
-            // 检测到的UI元素
-            GameObject hitObject = result.gameObject;
-
-            // 通过标签检查是否是面板
-            if (hitObject.CompareTag("InfoPanel"))
-            {
-                //hitObject.SetActive(false);
-                Destroy(hitObject);
-                StartCoroutine(WaitBeforeNextClose()); // 等2s再关下一个，避免连续关闭
-                break;
-            }
-        }
-    }
 
     private bool IsCursorNearObject(GameObject obj)
     {
@@ -200,37 +157,18 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
             screenNormalPos.y * (screenCamera ? screenCamera.pixelHeight : Screen.height),
             screenCamera.nearClipPlane
         );
-        Vector3 worldPos = screenCamera.ScreenToWorldPoint(screenPixelPos);
-        return new Vector3(worldPos.x, worldPos.y, 0.0f);
+        return new Vector3(screenPixelPos.x, screenPixelPos.y, 0.0f);
     }
 
     private void ShowHoverAt(Vector3 position)
     {
-        // GUI 元素需要使用屏幕坐标
-        Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
-
         hoverDisplay.SetActive(true);
-        hoverDisplay.transform.position = screenPosition;
+        hoverDisplay.transform.position = position;
     }
 
     private void HideHover()
     {
         hoverDisplay.SetActive(false);
-    }
-
-
-    private void CreatePanelAt(Vector3 position, string scenicSpotName)
-    {
-        //创建面板
-        Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
-        GameObject infoPanel = Instantiate(infoPanelPrefab, screenPosition, Quaternion.identity);
-        Transform infoPanelset = canvas.transform.Find("InfoPanelSet");
-        infoPanel.transform.SetParent(infoPanelset, true); //创建在特定物件下以保证显示层级
-
-        //修改景点名称
-        Transform ScenicNameTransform = infoPanel.transform.Find("ScenicNameText");
-        TextMeshProUGUI ScenicNameText = ScenicNameTransform.GetComponent<TextMeshProUGUI>();
-        ScenicNameText.text = scenicSpotName;
     }
 
     IEnumerator WaitBeforeNextClose()
@@ -264,8 +202,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     //选择了某个景点
     private void SelectAScenicSpot(GameObject scenicSpot, bool updateRemote = true)
     {
-        Vector3 screenPosition = screenCamera.WorldToScreenPoint(scenicSpot.transform.position);
-        GameObject indicator = Instantiate(selectionIndicatorPrefab, screenPosition, Quaternion.identity, canvas.transform);
+        GameObject indicator = Instantiate(selectionIndicatorPrefab, scenicSpot.transform.position, Quaternion.identity, canvas.transform);
         scenicSpotSelectionManager.AddSelectedScenicSpot(scenicSpot, indicator, updateRemote); // 存储指示器
     }
 
@@ -363,7 +300,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         screenNormalPos = handScreenPos;
 
         ToggleScenicSpotSelection();
-        //HandleInfoPanel();
         HandleButton();
     }
 
