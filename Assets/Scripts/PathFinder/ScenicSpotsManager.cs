@@ -51,7 +51,9 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
     {
         for (int i = 0; i < indices.Count - 1; i++)
         {
-            string imageName = "Road/" + indices[i] + "-" + indices[i + 1];
+            int start = Mathf.Min(indices[i], indices[i + 1]);
+            int end = Mathf.Max(indices[i], indices[i + 1]);
+            string imageName = "Road/" + start + "-" + end; //总是用小号在前
             Sprite newSprite = Resources.Load<Sprite>(imageName);
 
             if (newSprite != null)
