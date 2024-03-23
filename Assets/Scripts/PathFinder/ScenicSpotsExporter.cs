@@ -8,7 +8,7 @@ public class ScenicSpotsExporter : MonoBehaviour {
     }
 
     void ExportScenicSpots() {
-        var scenicSpotsParent = GameObject.Find("Map/ScenicSpots");
+        var scenicSpotsParent = GameObject.Find("ScenicSpots");
         List<ScenicSpot> scenicSpots = new List<ScenicSpot>();
 
         int id = 0;

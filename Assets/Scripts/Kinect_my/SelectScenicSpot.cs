@@ -76,7 +76,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
         //gestureListener = MapGestureListener.Instance;
 
         // 添加景点 gameobject
-        var scenicSpotsParent = GameObject.Find("Map/ScenicSpots");
+        var scenicSpotsParent = GameObject.Find("ScenicSpots");
         if (scenicSpotsParent != null)
         {
             Transform[] scenicSpotsChildren = scenicSpotsParent.GetComponentsInChildren<Transform>(true);
