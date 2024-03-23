@@ -72,7 +72,7 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     void Start()
     {
         // 添加景点 gameobject
-        var scenicSpotsParent = GameObject.Find("Map/ScenicSpots");
+        var scenicSpotsParent = GameObject.Find("ScenicSpots");
         if (scenicSpotsParent != null){
             Transform[] scenicSpotsChildren = scenicSpotsParent.GetComponentsInChildren<Transform>(true);
             foreach (Transform child in scenicSpotsChildren)
@@ -253,17 +253,13 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
             screenNormalPos.y * (screenCamera ? screenCamera.pixelHeight : Screen.height),
             screenCamera.nearClipPlane
         );
-        Vector3 worldPos = screenCamera.ScreenToWorldPoint(screenPixelPos);
-        return new Vector3(worldPos.x, worldPos.y, 0.0f);
+        return new Vector3(screenPixelPos.x, screenPixelPos.y, 0.0f);
     }
 
     private void ShowHoverAt(Vector3 position)
     {
-        // GUI 元素需要使用屏幕坐标
-        Vector3 screenPosition = screenCamera.WorldToScreenPoint(position);
-
         hoverDisplay.SetActive(true);
-        hoverDisplay.transform.position = screenPosition;
+        hoverDisplay.transform.position = position;
     }
 
     private void HideHover()
