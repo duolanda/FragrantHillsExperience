@@ -3,21 +3,31 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
     public List<ScenicSpot> scenicSpots;
     public Dictionary<int, ScenicSpot> spotsDictionary;
-    public PathDrawer pathDrawer;
+    public Transform imagesParent; // 用于存放所有Image GameObjects的父对象
 
-    void Awake() {
+    void Awake()
+    {
         ImportScenicSpots();
-        Debug.Log("Json 导入完毕");        
+        Debug.Log("Json 导入完毕");
 
         //输出导入的景点
-        //foreach (ScenicSpot spot in result)
-        //{
-        //    Debug.Log(spot.name);
-        //}
+        // foreach (ScenicSpot spot in scenicSpots)
+        // {
+        //     Debug.Log(spot.name);
+        // }
+        
+        //路径绘制测试
+        // List<ScenicSpot> path = FindPathCoveringAllSpots(new List<int>{1,6,8,12,20,24,33}); 
+        // List<int> pathID = path.Select(spot => spot.id).ToList();
+        // List<string> pathName = path.Select(spot => spot.name).ToList();
+        // Debug.Log("途径景点："+string.Join(", ", pathName));
+        // Debug.Log("路线："+string.Join(", ", pathID));
+        // DrawRoad(pathID);
     }
 
     public void DrawPathByName(HashSet<string> spotNames)
@@ -33,12 +43,43 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         }
 
         List<ScenicSpot> path = FindPathCoveringAllSpots(selectedSpotIDs);
-        pathDrawer.DrawPath(path);
+        List<int> pathID = path.Select(spot => spot.id).ToList();
+        DrawRoad(pathID);
+    }
+
+    private void DrawRoad(List<int> indices)
+    {
+        for (int i = 0; i < indices.Count - 1; i++)
+        {
+            string imageName = "Road/" + indices[i] + "-" + indices[i + 1];
+            Sprite newSprite = Resources.Load<Sprite>(imageName);
+
+            if (newSprite != null)
+            {
+                GameObject newImageGO = new GameObject(imageName);
+                newImageGO.transform.SetParent(imagesParent, false);
+                Image newImage = newImageGO.AddComponent<Image>();
+                newImage.sprite = newSprite;
+                newImage.color = new Color(255/255f,154/255f,4/255f,1);
+                
+                RectTransform rectTransform = newImageGO.GetComponent<RectTransform>();
+                rectTransform.sizeDelta = new Vector2(3952, 4297); // 设置大小
+                rectTransform.localScale = new Vector3(0.48f, 0.48f, 1); // 设置缩放
+
+            }
+            else
+            {
+                Debug.LogWarning("Sprite not found for: " + imageName);
+            }
+        }
     }
     
     public void ClearDraw()
     {
-        pathDrawer.ClearPath();
+        foreach (Transform child in imagesParent)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     void ImportScenicSpots() {
@@ -92,4 +133,5 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         // Debug.Log(temp);
         return result;
     }
+    
 }
