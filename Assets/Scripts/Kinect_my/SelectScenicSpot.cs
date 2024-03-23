@@ -232,7 +232,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private void HandleButton()
     {
         PointerEventData pointerEventData = new PointerEventData(eventSystem);
-        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
+        pointerEventData.position = GetCursorPosition();
         List<RaycastResult> results = new List<RaycastResult>();
         raycaster.Raycast(pointerEventData, results);
 
@@ -244,6 +244,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                 switch (result.gameObject.name)
                 {
                     case "DrawPathButton":
+                        Debug.Log("触发按钮");
                         DrawPath();
                         break;
                     case "ResetButton":

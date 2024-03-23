@@ -286,7 +286,7 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     private void HandleButton()
     {
         PointerEventData pointerEventData = new PointerEventData(eventSystem);
-        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
+        pointerEventData.position = GetCursorPosition();
         List<RaycastResult> results = new List<RaycastResult>();
         raycaster.Raycast(pointerEventData, results);
 
