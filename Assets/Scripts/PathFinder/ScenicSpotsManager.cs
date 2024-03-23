@@ -15,19 +15,21 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         ImportScenicSpots();
         Debug.Log("Json 导入完毕");
 
+        ImportDistances();
+
         //输出导入的景点
         // foreach (ScenicSpot spot in scenicSpots)
         // {
         //     Debug.Log(spot.name);
         // }
-        
+
         //路径绘制测试
-        // List<ScenicSpot> path = FindPathCoveringAllSpots(new List<int>{1,6,8,12,20,24,33}); 
-        // List<int> pathID = path.Select(spot => spot.id).ToList();
-        // List<string> pathName = path.Select(spot => spot.name).ToList();
-        // Debug.Log("途径景点："+string.Join(", ", pathName));
-        // Debug.Log("路线："+string.Join(", ", pathID));
-        // DrawRoad(pathID);
+        List<ScenicSpot> path = FindPathCoveringAllSpots(new List<int>{1,6,8,12,20,24,33}); 
+        List<int> pathID = path.Select(spot => spot.id).ToList();
+        List<string> pathName = path.Select(spot => spot.name).ToList();
+        Debug.Log("途径景点："+string.Join(", ", pathName));
+        Debug.Log("路线："+string.Join(", ", pathID));
+        DrawRoad(pathID);
     }
 
     public void DrawPathByName(HashSet<string> spotNames)
@@ -88,6 +90,11 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         string json = File.ReadAllText(Application.dataPath + "/Json/ScenicSpots.json");
         ScenicSpot[] spotsArray = JsonHelper.FromJson<ScenicSpot>(json);
         scenicSpots = new List<ScenicSpot>(spotsArray);
+        
+        // 初始化距离字典
+        foreach (var spot in spotsArray) {
+            spot.distances = new Dictionary<ScenicSpot, float>();
+        }
 
         // 构建邻居关系
         spotsDictionary = scenicSpots.ToDictionary(spot => spot.id, spot => spot);
@@ -134,6 +141,28 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         // Debug.Log("start:"+start.name+" end:"+end.name);
         // Debug.Log(temp);
         return result;
+    }
+    
+    private void ImportDistances()
+    {
+        string[] lines = File.ReadAllLines("Assets/Resources/distance.csv");
+
+        foreach (string line in lines)
+        {
+            string[] parts = line.Split(',');
+            int sourceId = int.Parse(parts[0]);
+            int targetId = int.Parse(parts[1]);
+            float distance = float.Parse(parts[2]);
+
+            ScenicSpot sourceSpot = scenicSpots.FirstOrDefault(spot => spot.id == sourceId);
+            ScenicSpot targetSpot = scenicSpots.FirstOrDefault(spot => spot.id == targetId);
+
+            if (sourceSpot != null && targetSpot != null)
+            {
+                sourceSpot.SetDistanceToNeighbor(targetSpot, distance);
+                targetSpot.SetDistanceToNeighbor(sourceSpot, distance);
+            }
+        }
     }
     
 }

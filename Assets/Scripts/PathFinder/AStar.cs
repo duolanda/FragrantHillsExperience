@@ -28,7 +28,7 @@ public static class AStar {
                     continue;
                 }
 
-                float newMovementCostToNeighbor = currentSpot.gCost + Vector3.Distance(currentSpot.position, neighbor.position);
+                float newMovementCostToNeighbor = currentSpot.gCost + currentSpot.distances[neighbor];
                 if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor)) {
                     neighbor.gCost = newMovementCostToNeighbor;
                     neighbor.hCost = Vector3.Distance(neighbor.position, targetSpot.position);
