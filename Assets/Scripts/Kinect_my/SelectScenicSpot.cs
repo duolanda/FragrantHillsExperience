@@ -275,6 +275,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                     default:
                         return;
                 }
+                StartCoroutine(ResetButtonSprite(result.gameObject, normalButtonSprite));
             }
             else
             {
