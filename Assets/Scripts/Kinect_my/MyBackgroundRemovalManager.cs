@@ -85,57 +85,18 @@ public class MyBackgroundRemovalManager : MonoBehaviour
         return isBrInited;
     }
 
-    //	// returns the raw foreground image
-    //	public byte[] GetForegroundImage()
-    //	{
-    //		return foregroundImage;
-    //	}
 
-    /// <summary>
-    /// Gets the foreground image texture.
-    /// </summary>
-    /// <returns>The foreground image texture.</returns>
-    public Texture GetForegroundTex()
+    public Texture GetPlayerForegroundTex(int playerIndex)
     {
-        //		bool bHiResSupported = sensorData != null && sensorData.sensorInterface != null ?
-        //			sensorData.sensorInterface.IsBRHiResSupported() : false;
-        bool bKinect1Int = sensorData != null && sensorData.sensorInterface != null ?
-            (sensorData.sensorInterface.GetSensorPlatform() == KinectInterop.DepthSensorPlatform.KinectSDKv1) : false;
-
-        if (computeBodyTexOnly && sensorData != null && sensorData.alphaBodyTexture)
+        if (playerForegroundTextures.ContainsKey(playerIndex))
         {
-            return sensorData.alphaBodyTexture;
-        }
-        else if (sensorData != null /**&& bHiResSupported*/ && !bKinect1Int && sensorData.color2DepthTexture)
-        {
-            return sensorData.color2DepthTexture;
-        }
-        else if (sensorData != null && !bKinect1Int && sensorData.depth2ColorTexture)
-        {
-            return sensorData.depth2ColorTexture;
-        }
-
-        return foregroundTex;
-    }
-
-    /// <summary>
-    /// Gets the alpha body texture.
-    /// </summary>
-    /// <returns>The alpha body texture.</returns>
-    public Texture GetAlphaBodyTex()
-    {
-        if (sensorData != null)
-        {
-            if (sensorData.alphaBodyTexture != null)
-                return sensorData.alphaBodyTexture;
-            else if (foregroundTex != null)
-                return foregroundTex;  // fallback for k1
-            else
-                return sensorData.bodyIndexTexture;  // general fallback (may have different dimensions)
+            return playerForegroundTextures[playerIndex];
         }
 
         return null;
     }
+
+
 
     //----------------------------------- end of public functions --------------------------------------//
 
@@ -318,55 +279,6 @@ public class MyBackgroundRemovalManager : MonoBehaviour
             }
         }
     }
-    void OnGUI()
-    {
-        if (isBrInited && foregroundCamera)
-        {
-            // get the foreground rectangle (use the portrait background, if available)
-            PortraitBackground portraitBack = PortraitBackground.Instance;
-            if (portraitBack && portraitBack.enabled)
-            {
-                foregroundRect = portraitBack.GetBackgroundRect();
 
-                foregroundRect.y += foregroundRect.height;  // invert y
-                foregroundRect.height = -foregroundRect.height;
-            }
-
-            // update the foreground texture
-            //			bool bHiResSupported = sensorData != null && sensorData.sensorInterface != null ?
-            //				sensorData.sensorInterface.IsBRHiResSupported() : false;
-            bool bKinect1Int = sensorData != null && sensorData.sensorInterface != null ?
-                (sensorData.sensorInterface.GetSensorPlatform() == KinectInterop.DepthSensorPlatform.KinectSDKv1) : false;
-
-            if (computeBodyTexOnly && sensorData != null && sensorData.alphaBodyTexture)
-            {
-                GUI.DrawTexture(foregroundRect, sensorData.alphaBodyTexture);
-            }
-            else if (sensorData != null /**&& bHiResSupported*/ && !bKinect1Int && sensorData.color2DepthTexture)
-            {
-                //GUI.DrawTexture(foregroundRect, sensorData.alphaBodyTexture);
-                GUI.DrawTexture(foregroundRect, sensorData.color2DepthTexture);
-            }
-            else if (sensorData != null && !bKinect1Int && sensorData.depth2ColorTexture)
-            {
-                //GUI.DrawTexture(foregroundRect, sensorData.alphaBodyTexture);
-                GUI.DrawTexture(foregroundRect, sensorData.depth2ColorTexture);
-            }
-            else if (foregroundTex)
-            {
-                //GUI.DrawTexture(foregroundRect, sensorData.alphaBodyTexture);
-                GUI.DrawTexture(foregroundRect, foregroundTex);
-            }
-        }
-    }
-
-    public Texture GetPlayerForegroundTex(int playerIndex)
-    {
-        if (playerForegroundTextures.ContainsKey(playerIndex))
-        {
-            return playerForegroundTextures[playerIndex];
-        }
-
-        return null;
-    }
+    
 }
