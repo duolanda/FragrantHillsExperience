@@ -45,6 +45,9 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     private MyGestureListener gestureListener;
     private Dictionary<string, ScenicSpotInfo> scenicSpotInfos;
 
+    private Sprite normalButtonSprite; // 正常状态的按钮图
+    private Sprite pressedButtonSprite; // 按下状态的按钮图
+
     private bool isPanelActive = false;
     private Coroutine panelAutoCloseCoroutine = null;
 
@@ -115,7 +118,11 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         {
             gestureListener = GetGestureListener();
         }
-}
+
+        // 加载按钮图标
+        normalButtonSprite = Resources.Load<Sprite>("Button/按钮");
+        pressedButtonSprite = Resources.Load<Sprite>("Button/按钮-按下");
+    }
 
     void Update()
     {
@@ -267,6 +274,20 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         hoverDisplay.SetActive(false);
     }
 
+    private IEnumerator ResetButtonSprite(GameObject button, Sprite normalSprite)
+    {
+        yield return new WaitForSeconds(0.2f); // 等待一段时间
+        ChangeButtonSprite(button, normalButtonSprite); // 恢复正常状态的图片
+    }
+
+    private void ChangeButtonSprite(GameObject button, Sprite newSprite)
+    {
+        Image buttonImage = button.GetComponent<Image>();
+        if (buttonImage != null)
+        {
+            buttonImage.sprite = newSprite;
+        }
+    }
 
     IEnumerator WaitClose(GameObject panel, TextMeshProUGUI textComponent, string instructionText)
     {
@@ -297,11 +318,13 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                 switch (result.gameObject.name)
                 {
                     case "MainMenuButton":
+                        ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                         ReturnToMainMenu();
                         break;
                     default:
                         return;
                 }
+                StartCoroutine(ResetButtonSprite(result.gameObject, normalButtonSprite));
             }
             else
             {
