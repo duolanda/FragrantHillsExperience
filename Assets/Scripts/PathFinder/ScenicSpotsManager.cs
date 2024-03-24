@@ -24,12 +24,12 @@ public class ScenicSpotsManager : Singleton<ScenicSpotsManager> {
         // }
 
         //路径绘制测试
-        List<ScenicSpot> path = FindPathCoveringAllSpots(new List<int>{1,6,8,12,20,24,33}); 
-        List<int> pathID = path.Select(spot => spot.id).ToList();
-        List<string> pathName = path.Select(spot => spot.name).ToList();
-        Debug.Log("途径景点："+string.Join(", ", pathName));
-        Debug.Log("路线："+string.Join(", ", pathID));
-        DrawRoad(pathID);
+        // List<ScenicSpot> path = FindPathCoveringAllSpots(new List<int>{1,6,8,12,20,24,33}); 
+        // List<int> pathID = path.Select(spot => spot.id).ToList();
+        // List<string> pathName = path.Select(spot => spot.name).ToList();
+        // Debug.Log("途径景点："+string.Join(", ", pathName));
+        // Debug.Log("路线："+string.Join(", ", pathID));
+        // DrawRoad(pathID);
     }
 
     public void DrawPathByName(HashSet<string> spotNames)
