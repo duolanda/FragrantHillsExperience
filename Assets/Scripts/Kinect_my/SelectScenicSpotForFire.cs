@@ -30,7 +30,6 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
 
     private int playerIndex = 0;
 
-
     private InteractionManager interactionManager;
 
     private GraphicRaycaster raycaster;
@@ -39,8 +38,8 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
 
-    private Vector3 originalScale = new Vector3(1f, 1f, 1f);
-    private Vector3 enlargedScale = new Vector3(1.05f, 1.05f, 1.05f); // 按钮放大的尺寸
+    private Sprite normalButtonSprite; // 正常状态的按钮图
+    private Sprite pressedButtonSprite; // 按下状态的按钮图
 
     private int highScore;
     private bool isOver = false;
@@ -65,11 +64,15 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
         fireManager.enabled = false;
         HandColliders.SetActive(false);
         Silhouette.SetActive(false);
+
+        // 加载按钮图标
+        normalButtonSprite = Resources.Load<Sprite>("Button/按钮");
+        pressedButtonSprite = Resources.Load<Sprite>("Button/按钮-按下");
     }
 
     void Update()
     {
-        CheckButtonScale();
+
     }
 
 
@@ -118,29 +121,6 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
         return new Vector3(worldPos.x, worldPos.y, 0.0f);
     }
 
-    private void CheckButtonScale()
-    {
-        PointerEventData pointerEventData = new PointerEventData(eventSystem);
-        pointerEventData.position = screenCamera.WorldToScreenPoint(GetCursorPosition());
-        List<RaycastResult> results = new List<RaycastResult>();
-        raycaster.Raycast(pointerEventData, results);
-
-        bool buttonHovered = false;
-        foreach (RaycastResult result in results)
-        {
-            if (result.gameObject.CompareTag("Button"))
-            {
-                result.gameObject.transform.localScale = enlargedScale;
-                buttonHovered = true;
-            }
-        }
-
-        // 如果没有按钮被悬停，恢复所有按钮的原始尺寸
-        if (!buttonHovered)
-        {
-            RestoreButtonScales();
-        }
-    }
 
     private void HandleButton()
     {
@@ -156,6 +136,7 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
             {
                 if(result.gameObject.name == "StartButton")
                 {
+                    ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                     StartGame();
                 }
 
@@ -163,14 +144,17 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
                 {
                     if (result.gameObject.name == "RetryButton")
                     {
+                        ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                         RetryGame();
                     }
                     else if (result.gameObject.name == "MainMenuButton")
                     {
+                        ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                         ReturnToMainMenu();
                     }
                 }
-               
+                StartCoroutine(ResetButtonSprite(result.gameObject, normalButtonSprite));
+
             }
             else
             {
@@ -236,15 +220,21 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
         PlayerPrefs.Save();
     }
 
-
-    private void RestoreButtonScales()
+    private IEnumerator ResetButtonSprite(GameObject button, Sprite normalSprite)
     {
-        GameObject[] buttons = GameObject.FindGameObjectsWithTag("Button");
-        foreach (GameObject button in buttons)
+        yield return new WaitForSeconds(0.2f); // 等待一段时间
+        ChangeButtonSprite(button, normalButtonSprite); // 恢复正常状态的图片
+    }
+
+    private void ChangeButtonSprite(GameObject button, Sprite newSprite)
+    {
+        Image buttonImage = button.GetComponent<Image>();
+        if (buttonImage != null)
         {
-            button.transform.localScale = originalScale;
+            buttonImage.sprite = newSprite;
         }
     }
+
 
     public void HandGripDetected(long userId, int userIndex, bool isRightHand, bool isHandInteracting, Vector3 handScreenPos)
     {
