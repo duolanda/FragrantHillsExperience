@@ -26,7 +26,7 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
     public GameObject Silhouette; // 剪影
 
     public GameObject gameOverPanel; // 游戏结束面板
-    public TextMeshProUGUI highScoreText; // 高分文本框
+    public TextMeshProUGUI highScoreNumber; // 高分分数文本框
 
     private int playerIndex = 0;
 
@@ -195,7 +195,7 @@ public class SelectScenicSpotForFire : MonoBehaviour, InteractionListenerInterfa
             SaveHighScore(highScore);
         }
 
-        highScoreText.text = "最高分数: " + highScore;
+        highScoreNumber.text = highScore.ToString();
     }
 
 

@@ -45,7 +45,6 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
 
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
-    private bool isWaitingClose = false;
     
     private Sprite normalButtonSprite; // 正常状态的按钮图
     private Sprite pressedButtonSprite; // 按下状态的按钮图
