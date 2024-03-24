@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18018606, g: 0.22559257, b: 0.30678663, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -850,7 +850,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePrefab: {fileID: 3413152457490855012, guid: cce78be52de71174b8bac204af956843, type: 3}
   spawnInterval: 0.5
-  duration: 60
+  duration: 10
   textCountDownSecond: {fileID: 2015298088}
   textExtinguishedCount: {fileID: 1190310559}
   gameStarted: 0
@@ -1619,7 +1619,7 @@ MonoBehaviour:
   HandColliders: {fileID: 1016022338}
   Silhouette: {fileID: 1333178233}
   gameOverPanel: {fileID: 1279231265}
-  highScoreNumber: {fileID: 0}
+  highScoreNumber: {fileID: 232761972}
 --- !u!1 &769312587
 GameObject:
   m_ObjectHideFlags: 0
@@ -2813,7 +2813,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1279231266
 RectTransform:
   m_ObjectHideFlags: 0
