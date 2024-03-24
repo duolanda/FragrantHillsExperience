@@ -46,6 +46,10 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     private InteractionManager.HandEventType lastHandEvent = InteractionManager.HandEventType.None;
     private Vector3 screenNormalPos = Vector3.zero;
     private bool isWaitingClose = false;
+    
+    private Sprite normalButtonSprite; // 正常状态的按钮图
+    private Sprite pressedButtonSprite; // 按下状态的按钮图
+
 
     void OnEnable()
     {
@@ -88,6 +92,11 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                 }
             }
         }
+        
+        // 加载按钮图标
+        normalButtonSprite = Resources.Load<Sprite>("Button/按钮");
+        pressedButtonSprite = Resources.Load<Sprite>("Button/按钮-按下");
+
 
     }
 
@@ -170,12 +179,20 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     {
         hoverDisplay.SetActive(false);
     }
-
-    IEnumerator WaitBeforeNextClose()
+    
+    private IEnumerator ResetButtonSprite(GameObject button, Sprite normalSprite)
     {
-        isWaitingClose = true; 
-        yield return new WaitForSeconds(2f); // 等待2秒
-        isWaitingClose = false; 
+        yield return new WaitForSeconds(0.2f); // 等待一段时间
+        ChangeButtonSprite(button, normalButtonSprite); // 恢复正常状态的图片
+    }
+    
+    private void ChangeButtonSprite(GameObject button, Sprite newSprite)
+    {
+        Image buttonImage = button.GetComponent<Image>();
+        if (buttonImage != null)
+        {
+            buttonImage.sprite = newSprite;
+        }
     }
 
 
@@ -244,13 +261,15 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
                 switch (result.gameObject.name)
                 {
                     case "DrawPathButton":
-                        Debug.Log("触发按钮");
+                        ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                         DrawPath();
                         break;
                     case "ResetButton":
+                        ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                         ResetSelectAndPath();
                         break;
                     case "MainMenuButton":
+                        ChangeButtonSprite(result.gameObject, pressedButtonSprite);
                         ReturnToMainMenu();
                         break;
                     default:
