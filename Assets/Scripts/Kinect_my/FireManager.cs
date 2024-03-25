@@ -10,6 +10,7 @@ public class FireManager : MonoBehaviour
     public float duration = 30f; // 设置持续时间为60秒
     public TextMeshProUGUI textCountDownSecond;
     public TextMeshProUGUI textExtinguishedCount;
+    public Texture2D spawnMask;
 
     private Vector2 fireSize;
     private int extinguishedCount = 0; // 扑灭的火焰数量
@@ -50,10 +51,22 @@ public class FireManager : MonoBehaviour
         float spawnRangeX = (width - fireSize.x) / 2; 
         float spawnRangeY = (height - fireSize.y) / 2;
 
-        Vector2 spawnPosition = new Vector2(
-            Random.Range(-spawnRangeX, spawnRangeX),
-            Random.Range(-spawnRangeY, spawnRangeY)
-        );
+        Vector2 spawnPosition = new Vector2(1920, 1080);
+
+        for (int i = 0; i < 100; i++) //100是尝试次数，避免死循环
+        {
+            // 在遮罩范围内随机选择一个点
+            float x = Random.Range(-spawnRangeX, spawnRangeX);
+            float y = Random.Range(-spawnRangeY, spawnRangeY);
+            Color pixelColor = spawnMask.GetPixel((int)x, (int)y);
+
+            // 如果像素是白色，生成火焰
+            if (pixelColor.r != 0) // 检查 r 值以确保不是黑色
+            {
+                spawnPosition = new Vector2(x, y);
+                break; // 成功生成后退出循环
+            }
+        }
 
         GameObject fire = Instantiate(firePrefab, spawnPosition, Quaternion.identity, transform);
         fire.GetComponent<FireTrigger>().OnExtinguished += () => extinguishedCount++; // 订阅事件

@@ -849,10 +849,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePrefab: {fileID: 3413152457490855012, guid: cce78be52de71174b8bac204af956843, type: 3}
-  spawnInterval: 0.5
+  spawnInterval: 0.4
   duration: 10
   textCountDownSecond: {fileID: 2015298088}
   textExtinguishedCount: {fileID: 1190310559}
+  spawnMask: {fileID: 2800000, guid: f54acaaaaba204e4aa218c43480da892, type: 3}
   gameStarted: 0
 --- !u!1 &451743359
 GameObject:
