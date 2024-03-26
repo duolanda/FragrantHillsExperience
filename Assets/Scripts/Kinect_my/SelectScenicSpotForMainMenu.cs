@@ -32,7 +32,7 @@ public class SelectScenicSpotForMainMenu : MonoBehaviour, InteractionListenerInt
     private Vector3 screenNormalPos = Vector3.zero;
 
     private Vector3 originalScale = new Vector3(1f, 1f, 1f);
-    private Vector3 enlargedScale = new Vector3(1.05f, 1.05f, 1.05f); // 按钮放大的尺寸
+    private Vector3 enlargedScale = new Vector3(1.12f, 1.12f, 1.12f); // 按钮放大的尺寸
 
 
 
