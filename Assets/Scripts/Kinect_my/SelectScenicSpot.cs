@@ -218,7 +218,7 @@ public class SelectScenicSpot : MonoBehaviour, InteractionListenerInterface
     //选择了某个景点
     private void SelectAScenicSpot(GameObject scenicSpot, bool updateRemote = true)
     {
-        GameObject indicator = Instantiate(selectionIndicatorPrefab, scenicSpot.transform.position, Quaternion.identity, canvas.transform);
+        GameObject indicator = Instantiate(selectionIndicatorPrefab, scenicSpot.transform.position+ new Vector3(0, 150, 0), Quaternion.identity, canvas.transform);
         scenicSpotSelectionManager.AddSelectedScenicSpot(scenicSpot, indicator, updateRemote); // 存储指示器
     }
 
