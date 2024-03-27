@@ -30,6 +30,8 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     private List<GameObject> scenicSpots = new List<GameObject>();
     private GameObject activeScenicSpot;
     private List<GameObject> bodyPanels = new List<GameObject>();
+    private List<GameObject> characters = new List<GameObject>();
+    private List<GameObject> afterChanges = new List<GameObject>();
 
 
     private InteractionManager interactionManager;
@@ -50,6 +52,7 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
 
     private bool isPanelActive = false;
     private Coroutine panelAutoCloseCoroutine = null;
+    private bool allowGestureCheck = true;
 
 
     public struct ScenicSpotInfo
@@ -57,12 +60,14 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         public string panelName;
         public string gestureName;
         public string instructionText;
+        public string characterName;
 
-        public ScenicSpotInfo(string panelName, string gestureName, string instructionText)
+        public ScenicSpotInfo(string panelName, string gestureName, string instructionText, string characterName)
         {
             this.panelName = panelName;
             this.gestureName = gestureName;
             this.instructionText = instructionText;
+            this.characterName = characterName;
         }
     }
 
@@ -98,14 +103,36 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
             }
         }
 
+        //添加五个角色
+        Transform charactersParent = canvas.transform.Find("Characters");
+        Transform[] characterChildren = charactersParent.GetComponentsInChildren<Transform>(true);
+        foreach (Transform child in characterChildren)
+        {
+            if (child != charactersParent.transform)
+            {
+                characters.Add(child.gameObject);
+            }
+        }
+
+        //添加五个变化后的状态
+        Transform afterChangesParent = canvas.transform.Find("AfterChanges");
+        Transform[] afterChangesChildren = afterChangesParent.GetComponentsInChildren<Transform>(true);
+        foreach (Transform child in afterChangesChildren)
+        {
+            if (child != afterChangesParent.transform)
+            {
+                afterChanges.Add(child.gameObject);
+            }
+        }
+
         //初始化字典
         scenicSpotInfos = new Dictionary<string, ScenicSpotInfo>
         {
-            { "香炉峰", new ScenicSpotInfo("XLFPanel", "pick", "请做出摘红叶的动作！") },
-            { "香雾窟", new ScenicSpotInfo("XWKPanel", "write", "请做出题字的动作！") },
-            { "双清别墅", new ScenicSpotInfo("SQBSPanel", "salute", "请做出敬礼的动作！") },
-            { "碧云寺", new ScenicSpotInfo("BYSPanel", "wooden_fish", "请做出敲木鱼的动作！") },
-            { "香山慈幼院", new ScenicSpotInfo("CYYPanel", "piano", "请做出弹琴的动作！") }
+            { "香炉峰", new ScenicSpotInfo("XLFPanel", "pick", "请做出摘红叶的动作！", "Tourist") },
+            { "香雾窟", new ScenicSpotInfo("XWKPanel", "write", "请做出题字的动作！", "Emperor") },
+            { "双清别墅", new ScenicSpotInfo("SQBSPanel", "salute", "请做出敬礼的动作！", "Chairman") },
+            { "碧云寺", new ScenicSpotInfo("BYSPanel", "wooden_fish", "请做出敲木鱼的动作！", "Monk") },
+            { "香山慈幼院", new ScenicSpotInfo("CYYPanel", "piano", "请做出弹琴的动作！", "Student") }
         };
 
         //获取 interactionManager 实例
@@ -128,18 +155,39 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
     {
         HandleHoverDisplay();
 
-        if (checkGestureName != "" && CheckGesture(checkGestureName) && scenicSpotInfos.TryGetValue(checkSpotName, out ScenicSpotInfo info))
+        if (allowGestureCheck && checkGestureName != "" 
+            && CheckGesture(checkGestureName) 
+            && scenicSpotInfos.TryGetValue(checkSpotName, out ScenicSpotInfo info))
         {
             foreach (GameObject panel in bodyPanels)
             {
                 if (panel.name == info.panelName)
                 {
-                    TextMeshProUGUI textComponent = panel.GetComponentInChildren<TextMeshProUGUI>();
-                    textComponent.text = "干得漂亮！";
-                    StartCoroutine(WaitClose(panel, textComponent, info.instructionText));
+                    if (panelAutoCloseCoroutine != null)
+                    {
+                        StopCoroutine(panelAutoCloseCoroutine);
+                        panelAutoCloseCoroutine = null; // 清除引用
+                    }
 
-                    MyForegroundToRawImage rb = panel.GetComponentInChildren<MyForegroundToRawImage>();
-                    rb.playerIndex = playerIndex;
+                    GameObject character = characters.Find(obj => obj.name == info.characterName);
+                    GameObject characterAfter = afterChanges.Find(obj => obj.name == info.characterName + "After");
+
+                    if(checkSpotName == "香山慈幼院")
+                    {
+                        character.SetActive(false);
+                        characterAfter.SetActive(true);
+                    }
+                    else
+                    {
+                        characterAfter.SetActive(true);
+                    }
+                    StartCoroutine(RestoreCharacter(character, characterAfter, checkSpotName)); //5s后恢复
+
+
+                    panel.SetActive(false);
+                    isPanelActive = false;
+                    interactionManager.guiHandCursor.gameObject.SetActive(true);
+
                     break;
                 }
             }
@@ -201,6 +249,9 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
                         interactionManager.guiHandCursor.gameObject.SetActive(false);
                         checkSpotName = scenicSpot.name;
                         checkGestureName = info.gestureName;
+
+                        allowGestureCheck = false;
+                        StartCoroutine(EnableGestureCheckAfterDelay(3)); //3s后再比对手势
 
                         MyForegroundToRawImage fg = panel.GetComponentInChildren<MyForegroundToRawImage>();
                         fg.playerIndex = playerIndex; //设置成对应的 player id
@@ -289,19 +340,22 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
         }
     }
 
-    IEnumerator WaitClose(GameObject panel, TextMeshProUGUI textComponent, string instructionText)
+    IEnumerator EnableGestureCheckAfterDelay(float delay)
     {
-        if (panelAutoCloseCoroutine != null)
-        {
-            StopCoroutine(panelAutoCloseCoroutine);
-            panelAutoCloseCoroutine = null; // 清除引用
-        }
+        yield return new WaitForSeconds(delay);
+        allowGestureCheck = true;
+    }
 
-        yield return new WaitForSeconds(3f); // 等待3秒
-        panel.SetActive(false);
-        isPanelActive = false;
-        interactionManager.guiHandCursor.gameObject.SetActive(true);
-        textComponent.text = instructionText;
+    IEnumerator RestoreCharacter(GameObject character, GameObject characterAfter, string spotName)
+    {
+        yield return new WaitForSeconds(5); // 等待5秒
+
+        if (spotName == "香山慈幼院")
+        {
+            character.SetActive(true);
+            characterAfter.SetActive(false);
+        }
+        characterAfter.SetActive(false);
     }
 
     private void HandleButton()
@@ -401,10 +455,6 @@ public class SelectScenicSpotForExperience : MonoBehaviour, InteractionListenerI
             panel.SetActive(false);
             isPanelActive = false;
             interactionManager.guiHandCursor.gameObject.SetActive(true);
-            TextMeshProUGUI textComponent = panel.GetComponentInChildren<TextMeshProUGUI>(); if (textComponent != null)
-            {
-                textComponent.text = instructionText;
-            }
         }
     }
 }
